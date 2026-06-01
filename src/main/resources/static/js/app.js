@@ -15,29 +15,127 @@ let currentDevTool = 'error';
 /* ===== 초기화 ===== */
 document.addEventListener('DOMContentLoaded', () => {
   generateStars();
-  initPortrait();   // 이미지 로드 시도 → 실패 시 SVG fallback
+  initPortraitSystem();  // portrait 이미지 시스템 초기화
   runGreeting();
 });
 
-/* ===== 포트레이트 이미지 / SVG fallback 처리 =====
- * /images/haeun-portrait.png 이 있으면 이미지 표시
- * 없거나 로드 실패하면 haeunSvgFallback 유지
- * ================================================= */
-function initPortrait() {
-  const img = document.getElementById('haeunPortraitImg');
-  const svg = document.getElementById('haeunSvgFallback');
-  if (!img || !svg) return;
+/* =============================================================
+   PORTRAIT SYSTEM — 반실사 이미지 기반 하은 portrait 관리
+   =============================================================
+   우선순위:
+     1. /images/haeun-{emotion}.png  (감정별 portrait)
+     2. /images/haeun-portrait.png   (기본 portrait)
+     3. SVG 캐릭터 fallback
+   ============================================================= */
 
-  // 이미지 로드 성공 → 이미지 표시, SVG 숨김
-  img.addEventListener('load', () => {
-    img.style.display = 'block';
-    svg.style.display = 'none';
+/* 감정별 portrait 이미지 경로 매핑 */
+const PORTRAIT_MAP = {
+  neutral:  '/images/haeun-neutral.png',
+  happy:    '/images/haeun-happy.png',
+  sad:      '/images/haeun-sad.png',
+  thinking: '/images/haeun-thinking.png',
+  comfort:  '/images/haeun-neutral.png',
+  excited:  '/images/haeun-happy.png',
+  error:    '/images/haeun-sad.png',
+};
+const PORTRAIT_DEFAULT = '/images/haeun-portrait.png';
+
+/* 현재 portrait 감정 상태 */
+let _currentPortraitEmotion = 'neutral';
+/* 이미 로드 성공한 URL 캐시 (재시도 방지) */
+const _portraitLoadedCache = new Set();
+/* portrait 이미지 엘리먼트 (null이면 portrait 시스템 없음) */
+let _portraitImg = null;
+
+/**
+ * 감정 portrait 설정
+ * 감정별 이미지 시도 → 없으면 기본 → 없으면 SVG fallback
+ * @param {string} emotion
+ */
+function setPortraitEmotion(emotion) {
+  if (!_portraitImg) return;
+  if (emotion === _currentPortraitEmotion) return;
+  _currentPortraitEmotion = emotion;
+
+  const targetUrl = PORTRAIT_MAP[emotion] || PORTRAIT_DEFAULT;
+
+  /* 이미 성공한 URL이면 바로 교체 */
+  if (_portraitLoadedCache.has(targetUrl)) {
+    _crossfadePortrait(targetUrl);
+    return;
+  }
+
+  /* 감정 이미지 시도 → 실패 시 기본 portrait 시도 → 실패 시 SVG */
+  _tryImage(targetUrl,
+    () => { _portraitLoadedCache.add(targetUrl); _crossfadePortrait(targetUrl); },
+    () => {
+      if (targetUrl === PORTRAIT_DEFAULT) { _showSVGFallback(); return; }
+      _tryImage(PORTRAIT_DEFAULT,
+        () => { _portraitLoadedCache.add(PORTRAIT_DEFAULT); _crossfadePortrait(PORTRAIT_DEFAULT); },
+        () => _showSVGFallback()
+      );
+    }
+  );
+}
+
+/** 이미지 URL을 preload해서 성공/실패 콜백 호출 */
+function _tryImage(url, onLoad, onError) {
+  const t = new Image();
+  t.onload  = onLoad;
+  t.onerror = onError;
+  t.src     = url;
+}
+
+/** portrait 이미지를 opacity crossfade로 교체 */
+function _crossfadePortrait(url) {
+  if (!_portraitImg) return;
+  _portraitImg.style.opacity = '0';
+  setTimeout(() => {
+    _portraitImg.src = url;
+    _portraitImg.style.opacity = '';
+  }, 320);
+}
+
+/** SVG fallback 표시 */
+function _showSVGFallback() {
+  if (_portraitImg) _portraitImg.style.display = 'none';
+  const svg = document.getElementById('haeunSvgFallback');
+  if (svg) svg.style.display = 'block';
+}
+
+/**
+ * Portrait 시스템 초기화
+ * - 초기 이미지 로드 + fallback 처리
+ * - 마우스 parallax 등록
+ * - VRM lookAt 병행 전달
+ */
+function initPortraitSystem() {
+  _portraitImg = document.getElementById('portraitImg');
+  if (!_portraitImg) return;
+
+  /* 기본 portrait 이미지 로드 결과 처리 */
+  _portraitImg.addEventListener('load', () => {
+    _portraitLoadedCache.add(_portraitImg.src);
+  });
+  _portraitImg.addEventListener('error', () => {
+    /* 기본 portrait 없음 → SVG fallback */
+    _showSVGFallback();
   });
 
-  // 이미지 로드 실패 (파일 없음) → SVG 유지 (기본값이 SVG이므로 아무것도 안 해도 됨)
-  img.addEventListener('error', () => {
-    img.style.display = 'none';
-    svg.style.display = 'block';
+  /* 마우스 이동 → portrait parallax + VRM 시선 추적 */
+  document.addEventListener('mousemove', (e) => {
+    const nx =  (e.clientX / window.innerWidth)  * 2 - 1;  // -1(왼) ~ 1(오)
+    const ny =  (e.clientY / window.innerHeight) * 2 - 1;  // -1(위) ~ 1(아래)
+
+    /* portrait parallax: 마우스 따라 이미지 미세 이동 (살아있는 느낌) */
+    const display = document.getElementById('portraitDisplay');
+    if (display) {
+      display.style.setProperty('--px', `${nx * 3.5}px`);
+      display.style.setProperty('--py', `${ny * 3.5}px`);
+    }
+
+    /* VRM이 활성화된 경우 시선 추적 전달 (Y반전) */
+    window.haeunAvatar?.lookAtCursor(nx, -ny);
   });
 }
 
@@ -86,6 +184,9 @@ async function runGreeting() {
   }
 
   await sleep(900);
+  /* 인사 완료: 하은 happy 표정 (portrait + VRM) */
+  window.haeunAvatar?.setEmotion('happy', 0.7);
+  setPortraitEmotion('happy');
   const btn = document.getElementById('greetingStartBtn');
   btn.style.display = 'block';
 }
@@ -179,9 +280,10 @@ async function sendChat() {
   input.value = '';
   scrollChat();
 
-  // 하은: 생각하는 표정 (답변 기다리는 동안)
+  // 하은: 생각하는 상태 (portrait + VRM 동시 적용)
   window.haeunAvatar?.setSpeaking(false);
   window.haeunAvatar?.setEmotion('thinking');
+  setPortraitEmotion('thinking');
 
   const typingId = showTyping();
 
@@ -195,26 +297,34 @@ async function sendChat() {
     removeTyping(typingId);
     appendMessage('haeun', data.message, data.timestamp);
 
-    // 하은: 답변 감정 반영 + 말하기 시작
+    // 하은: 답변 감정 반영 (portrait + VRM 동시 적용)
     const userEmotion  = detectEmotion(text);
     const replyEmotion = detectEmotion(data.message);
-    // 사용자가 힘들어하면 하은은 comfort 감정으로 응답
+    // 사용자가 힘들어하면 comfort로 응답
     const finalEmotion = (userEmotion === 'sad') ? 'comfort' : (replyEmotion || 'happy');
     window.haeunAvatar?.setEmotion(finalEmotion);
     window.haeunAvatar?.setSpeaking(true);
+    setPortraitEmotion(finalEmotion);
 
     // 텍스트 길이에 비례한 말하기 지속 시간 (min 2초, max 8초)
     const speakMs = Math.min(Math.max((data.message || '').length * 55, 2000), 8000);
     setTimeout(() => {
       window.haeunAvatar?.setSpeaking(false);
       window.haeunAvatar?.setEmotion('neutral');
+      setPortraitEmotion('neutral');
     }, speakMs);
 
   } catch {
     removeTyping(typingId);
     appendMessage('haeun', '지금은 제 생각 회로가 잠깐 흔들렸어요. 그래도 다시 말해주시면 들어볼게요.', now());
+    /* 에러 시: error 감정 → 2초 후 neutral 복귀 */
     window.haeunAvatar?.setSpeaking(false);
-    window.haeunAvatar?.setEmotion('neutral');
+    window.haeunAvatar?.setEmotion('error');
+    setPortraitEmotion('error');
+    setTimeout(() => {
+      window.haeunAvatar?.setEmotion('neutral');
+      setPortraitEmotion('neutral');
+    }, 2000);
   } finally {
     // 전송 완료 후 입력 복구
     input.disabled   = false;

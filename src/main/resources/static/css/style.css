@@ -326,29 +326,133 @@ html, body {
   border-radius: 12px;
   overflow: hidden;
   background: rgba(5,8,22,0.2);
-  min-height: 300px;  /* 모델/이미지 없을 때도 높이 유지 */
+  min-height: 300px;
 }
 
-/* ① 3D 아바타 캔버스 */
+/* =================================================================
+   PORTRAIT DISPLAY SYSTEM — 반실사 portrait 이미지 기반 렌더링
+   기본 렌더링 방식: 반실사 이미지 + CSS 효과
+   VRM 3D는 experimental (하단 canvas)
+   ================================================================= */
+
+/* portrait-display: 이미지 + 효과 레이어 컨테이너 */
+.portrait-display {
+  position: relative;
+  width: 100%;
+  height: 340px;
+  overflow: hidden;
+  border-radius: 12px;
+  /* breathing: 위아래 gentle float */
+  animation: portrait-breathe 5.5s ease-in-out infinite;
+}
+@keyframes portrait-breathe {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-5px); }
+}
+
+/* portrait 이미지 — 감정별로 JS가 src 교체 + crossfade */
+.portrait-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 15%;   /* 얼굴이 상단에 오도록 */
+  /* scale(1.07): parallax 이동 시 테두리 노출 방지 */
+  transform: scale(1.07) translate(var(--px, 0px), var(--py, 0px));
+  transition: transform 0.12s ease-out, opacity 0.35s ease;
+  will-change: transform, opacity;
+  display: block;
+  border-radius: 12px;
+}
+
+/* SVG fallback — portrait-img 오류 시 JS가 display:block으로 변경 */
+.portrait-svg-fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+}
+
+/* 스캔라인 — 가로 줄 패턴 (미묘한 홀로그램/CRT 느낌) */
+.portrait-scanline-v2 {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(126,184,247,0.022) 3px,
+    rgba(126,184,247,0.022) 4px
+  );
+}
+/* 세로 방향으로 내려가는 bright sweep 라인 */
+.portrait-scanline-v2::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 5%,
+    rgba(126,184,247,0.55) 50%,
+    transparent 95%
+  );
+  animation: scan-sweep-v2 7s ease-in-out infinite;
+  opacity: 0;
+}
+@keyframes scan-sweep-v2 {
+  0%   { top: -3%;   opacity: 0; }
+  6%   { opacity: 0.9; }
+  94%  { opacity: 0.6; }
+  100% { top: 106%;  opacity: 0; }
+}
+
+/* vignette: 주변을 어둡게 해서 portrait 중앙 집중 */
+.portrait-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  border-radius: 12px;
+  background: radial-gradient(
+    ellipse 80% 90% at 50% 30%,
+    transparent 40%,
+    rgba(5,8,22,0.60) 100%
+  );
+}
+
+/* inner HUD: 하단 상태 텍스트 */
+.portrait-inner-hud {
+  position: absolute;
+  bottom: 10px;
+  left: 0; right: 0;
+  text-align: center;
+  z-index: 4;
+  pointer-events: none;
+}
+.inner-hud-text {
+  font-size: 8px;
+  letter-spacing: 2.5px;
+  color: rgba(126,184,247,0.50);
+  font-family: 'Consolas','Courier New',monospace;
+}
+
+/* ② Experimental VRM 3D 캔버스 — 기본 숨김 */
 .haeun-avatar-canvas {
   width: 100%;
   height: 340px;
-  display: none;           /* 기본 숨김 — 3D 모델 로드 성공 시 아래 클래스로 표시 */
+  display: none;
   border-radius: 12px;
   background: transparent;
 }
-/* 모델 로드 성공 시 avatar.js가 추가하는 클래스 */
 .haeun-avatar-canvas.avatar-ready {
   display: block;
 }
 
-/* ② Fallback 래퍼 — 3D 모델 없을 때 표시 */
-.avatar-fallback-wrap {
-  width: 100%;
-  display: block;   /* 기본 표시 (3D 로드 전) */
-}
-
-/* 실제 반실사 이미지 에셋 */
+/* 기존 haeun-portrait-img (이전 구조 호환) */
 .haeun-portrait-img {
   width: 100%;
   height: auto;

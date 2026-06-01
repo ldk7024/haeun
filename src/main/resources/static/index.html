@@ -71,26 +71,24 @@
       <!-- 미디어 컨테이너: 3D 아바타 캔버스 우선 / fallback 자동 -->
       <div class="portrait-media-wrap">
 
-        <!-- ① 3D 아바타 캔버스 (Three.js + VRM 렌더링)
-             모델 로드 성공 시 avatar-ready 클래스 추가 → CSS로 표시됨
-             모델 없으면 canvas 숨김 → ②로 자동 fallback -->
-        <canvas id="haeunAvatarCanvas" class="haeun-avatar-canvas"></canvas>
+        <!-- ① 기본 렌더링: 반실사 portrait 이미지 시스템
+             우선순위:
+               1. /images/haeun-{emotion}.png (감정별)
+               2. /images/haeun-portrait.png  (기본)
+               3. 아래 SVG fallback
+             portrait.js (app.js 내 Portrait 객체)가 감정에 따라 src 교체 -->
+        <div class="portrait-display" id="portraitDisplay">
 
-        <!-- ② Fallback 영역 (3D 모델 없을 때 표시)
-             haeunAvatarFallback은 초기 block, 3D 로드 성공 시 JS가 none으로 변경 -->
-        <div id="haeunAvatarFallback" class="avatar-fallback-wrap">
-
-          <!-- 반실사 이미지 에셋 (있으면 JS가 표시, 없으면 SVG 표시) -->
+          <!-- 감정 portrait 이미지 -->
           <img
-            id="haeunPortraitImg"
-            class="haeun-portrait-img"
+            id="portraitImg"
+            class="portrait-img"
             src="/images/haeun-portrait.png"
             alt="하은"
-            style="display:none;"
           />
 
-          <!-- SVG 최종 fallback — 이미지도 없을 때 기본 표시 -->
-          <svg id="haeunSvgFallback" class="haeun-svg-fallback" viewBox="0 0 300 380" xmlns="http://www.w3.org/2000/svg">
+          <!-- SVG fallback — 이미지 없을 때 -->
+          <svg id="haeunSvgFallback" class="haeun-svg-fallback portrait-svg-fallback" viewBox="0 0 300 380" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <radialGradient id="faceGrad" cx="50%" cy="40%" r="60%">
             <stop offset="0%" stop-color="#fff0e8"/>
@@ -209,9 +207,20 @@
         <!-- 볼 홍조 -->
         <ellipse cx="85" cy="190" rx="17" ry="9" fill="#ffb0c0" opacity="0.32"/>
         <ellipse cx="215" cy="190" rx="17" ry="9" fill="#ffb0c0" opacity="0.32"/>
-          </svg><!-- /.haeun-svg-fallback -->
+          </svg><!-- /.portrait-svg-fallback -->
 
-        </div><!-- /.avatar-fallback-wrap -->
+          <!-- 효과 레이어: 스캔라인 + vignette + inner HUD -->
+          <div class="portrait-scanline-v2" aria-hidden="true"></div>
+          <div class="portrait-vignette" aria-hidden="true"></div>
+          <div class="portrait-inner-hud" aria-hidden="true">
+            <span class="inner-hud-text">◈ PERCEPTION ACTIVE</span>
+          </div>
+
+        </div><!-- /.portrait-display -->
+
+        <!-- ② Experimental: VRM 3D 아바타 (기본 비활성)
+             avatar.js 상단의 VRM_ENABLED = true 로 변경하면 활성화됩니다 -->
+        <canvas id="haeunAvatarCanvas" class="haeun-avatar-canvas" title="Experimental VRM 3D"></canvas>
 
       </div><!-- /.portrait-media-wrap -->
 
