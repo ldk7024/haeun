@@ -15,6 +15,11 @@
 
 <br/>
 
+<img src="src/main/resources/static/images/haeun-portrait.png" width="360" alt="HAEUN Portrait" />
+
+<br/>
+<br/>
+
 > *Detroit: Become Human을 보고 개발자가 되었다.*
 > *그리고 언젠가 사람을 이해하는 안드로이드를 만들고 싶었다.*
 > *HAEUN은 그 꿈의 첫 번째 조각이다.*
