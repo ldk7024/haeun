@@ -92,15 +92,20 @@ public class MockAIClientService implements AIClientService {
     @Override
     public String generateChatReply(String userMessage,
                                     List<ChatMessage> recentMessages,
-                                    List<HaeunMemory> memories) {
-        String contextText = buildContextText(recentMessages, memories);
+                                    List<HaeunMemory> memories,
+                                    List<String> semanticMemories) {
+        String contextText = buildContextText(recentMessages, memories, semanticMemories);
         return chatWithContext(userMessage, contextText);
     }
 
-    private String buildContextText(List<ChatMessage> recentMessages, List<HaeunMemory> memories) {
+    private String buildContextText(List<ChatMessage> recentMessages,
+                                    List<HaeunMemory> memories,
+                                    List<String> semanticMemories) {
         StringBuilder sb = new StringBuilder();
         recentMessages.forEach(m -> sb.append(m.getContent()).append(" "));
         memories.forEach(m -> sb.append(m.getContent()).append(" "));
+        // 의미 기억도 키워드 매칭에 포함 (Python Vector Service 결과)
+        semanticMemories.forEach(m -> sb.append(m).append(" "));
         return sb.toString().toLowerCase();
     }
 

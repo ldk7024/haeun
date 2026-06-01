@@ -148,7 +148,10 @@ AI
 ├── Memory Context Prompt
 ├── Context Priority Rule
 ├── Korean-only Response Guard
-└── Mock AI Fallback
+├── Mock AI Fallback
+├── Python FastAPI (Memory Microservice)
+├── ChromaDB (Vector DB)
+└── sentence-transformers (multilingual embedding)
 
 Avatar
 ├── Live Portrait Mode
@@ -369,6 +372,82 @@ src/main/resources/static/models/haeun.vrm
 
 ---
 
+## 🧠 Python Vector Memory Service
+
+하은은 기본 JPA Memory 외에도 **Python + ChromaDB 기반 의미 기억 시스템**을 사용할 수 있습니다.
+
+키워드가 정확히 일치하지 않아도 의미가 비슷한 기억을 찾아 하은의 답변에 반영합니다.
+
+> Python 서비스가 꺼져 있어도 Java 앱은 기존 방식으로 정상 동작합니다.
+
+---
+
+### 최초 1회 설치
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\setup-python-memory.ps1
+```
+
+Python 가상환경(.venv) 생성 및 의존성을 설치합니다.
+
+> **주의:** 최초 실행 시 임베딩 모델(sentence-transformers, 약 400MB)이 자동으로 다운로드됩니다.
+
+---
+
+### Python Memory Service만 실행
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\run-python-memory.ps1
+```
+
+---
+
+### Java + Python 통합 실행 (권장)
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\run-haeun-full.ps1
+```
+
+Python Memory Service를 새 창에서 열고, health check 후 Java Spring Boot를 벡터 메모리 활성화 상태로 실행합니다.
+
+---
+
+### Health Check
+
+```text
+http://127.0.0.1:8001/health
+http://127.0.0.1:8001/docs   (Swagger UI)
+```
+
+---
+
+### 동작 방식
+
+```text
+1. 사용자가 중요한 내용을 말하면 Java DB(H2)에 저장
+2. 동시에 Python Vector DB(ChromaDB)에 임베딩 저장
+3. 사용자가 질문하면 Python Vector DB에서 의미적으로 가까운 기억 검색
+4. 검색된 기억을 Ollama 프롬프트의 [장기 의미 기억] 섹션에 주입
+5. Python 서비스가 꺼져 있으면 기존 Java memory만 사용
+```
+
+---
+
+### Vector Memory 활성화/비활성화
+
+`application.yml`에서 직접 제어할 수 있습니다.
+
+```yaml
+haeun:
+  memory:
+    vector:
+      enabled: false   # true: Python Vector Service 사용 / false: Java 기억만 사용
+```
+
+`run-haeun-full.ps1`으로 실행하면 `enabled=true`가 자동으로 적용됩니다.
+
+---
+
 ## 🚀 실행 방법
 
 ### 요구사항
@@ -486,7 +565,7 @@ NullPointerException이 뭐야?
 ☑ 감정별 portrait fallback 구조 만들기
 ☑ VRM 3D 아바타 구조를 experimental로 보존하기
 
-☐ 사용자를 더 오래 기억하기
+☑ 사용자를 더 오래 기억하기 (Python Vector Memory)
 ☐ H2 file DB 또는 SQLite로 장기 기억 유지하기
 ☐ 하은 portrait 정식 이미지 적용하기
 ☐ 감정별 portrait 이미지 고도화하기

@@ -52,6 +52,16 @@ haeun:
 
       timeout-seconds: 60
 
+  memory:
+    vector:
+      # Python Vector Memory Service 활성화 여부
+      # true : python-memory-service를 먼저 실행한 뒤 활성화 (의미 기억 검색)
+      # false: 기존 Java 키워드 기억만 사용 (Python 없이 동작, 기본값)
+      enabled: false
+      base-url: http://localhost:8001
+      top-k: 5
+      timeout-seconds: 5
+
 logging:
   level:
     com.haeun: DEBUG

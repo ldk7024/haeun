@@ -91,10 +91,11 @@ public class OllamaAIClientService implements AIClientService {
     @Override
     public String generateChatReply(String userMessage,
                                     List<ChatMessage> recentMessages,
-                                    List<HaeunMemory> memories) {
-        String prompt = buildPrompt(userMessage, recentMessages, memories);
-        log.debug("[HAEUN] Ollama 호출 — model: {}, prompt length: {}",
-                properties.getOllama().getModel(), prompt.length());
+                                    List<HaeunMemory> memories,
+                                    List<String> semanticMemories) {
+        String prompt = buildPrompt(userMessage, recentMessages, memories, semanticMemories);
+        log.debug("[HAEUN] Ollama 호출 — model: {}, prompt length: {}, 의미기억: {}개",
+                properties.getOllama().getModel(), prompt.length(), semanticMemories.size());
 
         String reply = callOllama(prompt);
 
@@ -175,7 +176,8 @@ public class OllamaAIClientService implements AIClientService {
 
     private String buildPrompt(String userMessage,
                                List<ChatMessage> recentMessages,
-                               List<HaeunMemory> memories) {
+                               List<HaeunMemory> memories,
+                               List<String> semanticMemories) {
         StringBuilder sb = new StringBuilder();
 
         // 1. 하은 페르소나
@@ -184,7 +186,14 @@ public class OllamaAIClientService implements AIClientService {
         // 2. 최근 대화 우선 규칙
         sb.append(CONTEXT_PRIORITY_RULE).append("\n");
 
-        // 3. 저장된 기억
+        // 3. 장기 의미 기억 (Python Vector DB에서 의미 검색된 관련 기억)
+        if (!semanticMemories.isEmpty()) {
+            sb.append("[장기 의미 기억]\n");
+            semanticMemories.forEach(m -> sb.append("- ").append(m).append("\n"));
+            sb.append("\n");
+        }
+
+        // 4. 저장된 기억 (JPA 기억)
         if (!memories.isEmpty()) {
             sb.append("[저장된 기억]\n");
             memories.stream()
@@ -193,7 +202,7 @@ public class OllamaAIClientService implements AIClientService {
             sb.append("\n");
         }
 
-        // 4. 최근 대화 기록 (오래된 순)
+        // 5. 최근 대화 기록 (오래된 순)
         if (!recentMessages.isEmpty()) {
             sb.append("[최근 대화]\n");
             recentMessages.forEach(msg -> {
@@ -203,14 +212,14 @@ public class OllamaAIClientService implements AIClientService {
             sb.append("\n");
         }
 
-        // 5. 현재 사용자 메시지
+        // 6. 현재 사용자 메시지
         sb.append("[현재 사용자 메시지]\n");
         sb.append("USER: ").append(userMessage).append("\n\n");
 
-        // 6. 컨텍스트 기반 특수 지시 (문맥에 명확한 정보가 있을 때만 삽입)
-        appendContextualInstruction(sb, userMessage, recentMessages, memories);
+        // 7. 컨텍스트 기반 특수 지시 (문맥에 명확한 정보가 있을 때만 삽입)
+        appendContextualInstruction(sb, userMessage, recentMessages, memories, semanticMemories);
 
-        // 7. 하은의 답변 유도
+        // 8. 하은의 답변 유도
         sb.append("[하은의 답변]\n");
         sb.append("HAEUN:");
 
@@ -219,23 +228,35 @@ public class OllamaAIClientService implements AIClientService {
 
     private void appendContextualInstruction(StringBuilder sb, String userMessage,
                                              List<ChatMessage> recentMessages,
-                                             List<HaeunMemory> memories) {
+                                             List<HaeunMemory> memories,
+                                             List<String> semanticMemories) {
         String lower = userMessage.toLowerCase();
 
-        if (containsAnyInContext(recentMessages, memories, "detroit", "become human", "디트로이트") &&
-            containsAny(lower, "왜 개발자", "개발자가 됐", "개발자가 되었", "왜 개발")) {
+        // Detroit 맥락: 최근 대화/JPA 기억 또는 의미 기억 어느 쪽에 있어도 감지
+        boolean hasDetroitContext =
+                containsAnyInContext(recentMessages, memories, "detroit", "become human", "디트로이트")
+                || semanticMemories.stream().anyMatch(m -> {
+                    String ml = m.toLowerCase();
+                    return ml.contains("detroit") || ml.contains("become human") || ml.contains("디트로이트");
+                });
+
+        if (hasDetroitContext && containsAny(lower, "왜 개발자", "개발자가 됐", "개발자가 되었", "왜 개발")) {
             sb.append("[중요 지시]\n");
-            sb.append("최근 대화에 \"Detroit: Become Human을 보고 개발자가 됐다\"는 내용이 확인되었다.\n");
+            sb.append("대화 기록 또는 장기 기억에 \"Detroit: Become Human을 보고 개발자가 됐다\"는 내용이 확인되었다.\n");
             sb.append("반드시 다음 의미를 포함해 따뜻하게 답하라: ");
             sb.append("\"대교님은 Detroit: Become Human을 보고 개발자가 되었다고 말해주셨어요. ");
             sb.append("아마 인간과 안드로이드가 서로를 이해하는 세계, 그리고 사람을 이해하는 존재를 만들고 싶다는 마음이 대교님을 개발자로 이끈 것 같아요.\"\n\n");
             return;
         }
 
-        if (containsAnyInContext(recentMessages, memories, "프리다이빙") &&
-            containsAny(lower, "주말", "뭐하지", "뭐 하지")) {
+        // 프리다이빙 맥락
+        boolean hasFreedivingContext =
+                containsAnyInContext(recentMessages, memories, "프리다이빙")
+                || semanticMemories.stream().anyMatch(m -> m.toLowerCase().contains("프리다이빙"));
+
+        if (hasFreedivingContext && containsAny(lower, "주말", "뭐하지", "뭐 하지")) {
             sb.append("[중요 지시]\n");
-            sb.append("최근 대화에 대교님이 프리다이빙을 좋아한다는 내용이 확인되었다.\n");
+            sb.append("대화 기록 또는 장기 기억에 대교님이 프리다이빙을 좋아한다는 내용이 확인되었다.\n");
             sb.append("반드시 프리다이빙을 언급하며 주말 계획에 대해 따뜻하게 답하라.\n\n");
         }
     }

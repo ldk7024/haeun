@@ -26,7 +26,7 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
  * 2. 또는 run-java17.ps1 사용
  *
  *    .\run-java17.ps1
- *
+ *    powershell -ExecutionPolicy Bypass -File .\run-haeun-full.ps1
  * 3. 실행 후 접속
  *
  *    http://localhost:8080

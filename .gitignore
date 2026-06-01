@@ -13,3 +13,27 @@ build/
 # OS
 .DS_Store
 Thumbs.db
+
+# ============================================================
+# Python Memory Service
+# ============================================================
+
+# Python 캐시
+__pycache__/
+*.pyc
+*.pyo
+
+# Python 가상환경
+python-memory-service/.venv/
+python-memory-service/venv/
+python-memory-service/.env
+
+# HuggingFace 모델 캐시 (sentence-transformers 다운로드 위치)
+# 모델 파일은 크기가 크므로 Git에 포함하지 않는다.
+python-memory-service/models/
+
+# ChromaDB 로컬 데이터
+# 기본값: Git에 포함하지 않음 (로컬 개발 데이터는 공유 불필요)
+# 팀 협업이나 배포 환경에서 기억 데이터를 공유하고 싶다면
+# 아래 줄을 주석 처리하고 chroma_db/ 디렉토리를 커밋할 수 있다.
+python-memory-service/chroma_db/
