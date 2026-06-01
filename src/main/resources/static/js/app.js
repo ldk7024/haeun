@@ -15,8 +15,31 @@ let currentDevTool = 'error';
 /* ===== 초기화 ===== */
 document.addEventListener('DOMContentLoaded', () => {
   generateStars();
+  initPortrait();   // 이미지 로드 시도 → 실패 시 SVG fallback
   runGreeting();
 });
+
+/* ===== 포트레이트 이미지 / SVG fallback 처리 =====
+ * /images/haeun-portrait.png 이 있으면 이미지 표시
+ * 없거나 로드 실패하면 haeunSvgFallback 유지
+ * ================================================= */
+function initPortrait() {
+  const img = document.getElementById('haeunPortraitImg');
+  const svg = document.getElementById('haeunSvgFallback');
+  if (!img || !svg) return;
+
+  // 이미지 로드 성공 → 이미지 표시, SVG 숨김
+  img.addEventListener('load', () => {
+    img.style.display = 'block';
+    svg.style.display = 'none';
+  });
+
+  // 이미지 로드 실패 (파일 없음) → SVG 유지 (기본값이 SVG이므로 아무것도 안 해도 됨)
+  img.addEventListener('error', () => {
+    img.style.display = 'none';
+    svg.style.display = 'block';
+  });
+}
 
 /* ===== 별 파티클 생성 ===== */
 function generateStars() {
@@ -131,6 +154,17 @@ async function loadChatHistory() {
   }
 }
 
+/* ===== 감정 텍스트 판별 (avatar.js의 window.detectEmotion과 동일 로직) ===== */
+function detectEmotion(text) {
+  if (!text) return 'neutral';
+  if (/힘들|슬프|우울|괴롭|지쳐|아파|힘드/.test(text))          return 'sad';
+  if (/고마|감사|좋아|기쁘|행복|ㅋㅋ|ㅎㅎ/.test(text))         return 'happy';
+  if (/왜|어떻게|모르겠|이해가|궁금|모르/.test(text))            return 'thinking';
+  if (/대박|멋지|최고|진짜!|!!/.test(text))                       return 'excited';
+  if (/괜찮|걱정|힘내|응원|안심/.test(text))                      return 'comfort';
+  return 'neutral';
+}
+
 async function sendChat() {
   const input   = document.getElementById('chatInput');
   const sendBtn = document.querySelector('.chat-send-btn');
@@ -145,6 +179,10 @@ async function sendChat() {
   input.value = '';
   scrollChat();
 
+  // 하은: 생각하는 표정 (답변 기다리는 동안)
+  window.haeunAvatar?.setSpeaking(false);
+  window.haeunAvatar?.setEmotion('thinking');
+
   const typingId = showTyping();
 
   try {
@@ -156,9 +194,27 @@ async function sendChat() {
     const data = await res.json();
     removeTyping(typingId);
     appendMessage('haeun', data.message, data.timestamp);
+
+    // 하은: 답변 감정 반영 + 말하기 시작
+    const userEmotion  = detectEmotion(text);
+    const replyEmotion = detectEmotion(data.message);
+    // 사용자가 힘들어하면 하은은 comfort 감정으로 응답
+    const finalEmotion = (userEmotion === 'sad') ? 'comfort' : (replyEmotion || 'happy');
+    window.haeunAvatar?.setEmotion(finalEmotion);
+    window.haeunAvatar?.setSpeaking(true);
+
+    // 텍스트 길이에 비례한 말하기 지속 시간 (min 2초, max 8초)
+    const speakMs = Math.min(Math.max((data.message || '').length * 55, 2000), 8000);
+    setTimeout(() => {
+      window.haeunAvatar?.setSpeaking(false);
+      window.haeunAvatar?.setEmotion('neutral');
+    }, speakMs);
+
   } catch {
     removeTyping(typingId);
     appendMessage('haeun', '지금은 제 생각 회로가 잠깐 흔들렸어요. 그래도 다시 말해주시면 들어볼게요.', now());
+    window.haeunAvatar?.setSpeaking(false);
+    window.haeunAvatar?.setEmotion('neutral');
   } finally {
     // 전송 완료 후 입력 복구
     input.disabled   = false;

@@ -5,6 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HAEUN — A Small Dream Toward an Android Heart</title>
   <link rel="stylesheet" href="/css/style.css">
+  <!--
+    Three.js + @pixiv/three-vrm importmap
+    ES Modules로 로드됩니다.
+    브라우저가 importmap을 지원하지 않으면 avatar.js가 동작하지 않고
+    자동으로 portrait/SVG fallback 이 표시됩니다.
+  -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.168.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.168.0/examples/jsm/",
+      "@pixiv/three-vrm": "https://cdn.jsdelivr.net/npm/@pixiv/three-vrm@3.3.0/lib/three-vrm.module.js"
+    }
+  }
+  </script>
 </head>
 <body>
 
@@ -30,11 +45,52 @@
 
   <!-- 왼쪽 패널: 하은 캐릭터 -->
   <aside class="character-panel">
-    <div class="character-wrapper">
+  <!-- ============================================
+       하은 포트레이트 영역
+       /images/haeun-portrait.png 이 있으면 이미지 표시
+       없으면 기존 SVG 캐릭터 fallback
+       ============================================ -->
+  <div class="haeun-portrait-shell">
 
-      <!-- 하은 SVG 캐릭터 -->
-      <div class="character-glow-ring"></div>
-      <svg class="haeun-svg" viewBox="0 0 300 380" xmlns="http://www.w3.org/2000/svg">
+    <!-- 배경 환경광 -->
+    <div class="haeun-portrait-glow"></div>
+
+    <!-- 홀로그램 헤일로 링 (CSS 애니메이션) -->
+    <div class="haeun-portrait-halo halo-outer"></div>
+    <div class="haeun-portrait-halo halo-inner"></div>
+
+    <!-- 유리 프레임 패널 -->
+    <div class="haeun-portrait-frame">
+
+      <!-- SF UI 코너 마커 -->
+      <div class="portrait-corner-bracket tl"></div>
+      <div class="portrait-corner-bracket tr"></div>
+      <div class="portrait-corner-bracket bl"></div>
+      <div class="portrait-corner-bracket br"></div>
+
+      <!-- 미디어 컨테이너: 3D 아바타 캔버스 우선 / fallback 자동 -->
+      <div class="portrait-media-wrap">
+
+        <!-- ① 3D 아바타 캔버스 (Three.js + VRM 렌더링)
+             모델 로드 성공 시 avatar-ready 클래스 추가 → CSS로 표시됨
+             모델 없으면 canvas 숨김 → ②로 자동 fallback -->
+        <canvas id="haeunAvatarCanvas" class="haeun-avatar-canvas"></canvas>
+
+        <!-- ② Fallback 영역 (3D 모델 없을 때 표시)
+             haeunAvatarFallback은 초기 block, 3D 로드 성공 시 JS가 none으로 변경 -->
+        <div id="haeunAvatarFallback" class="avatar-fallback-wrap">
+
+          <!-- 반실사 이미지 에셋 (있으면 JS가 표시, 없으면 SVG 표시) -->
+          <img
+            id="haeunPortraitImg"
+            class="haeun-portrait-img"
+            src="/images/haeun-portrait.png"
+            alt="하은"
+            style="display:none;"
+          />
+
+          <!-- SVG 최종 fallback — 이미지도 없을 때 기본 표시 -->
+          <svg id="haeunSvgFallback" class="haeun-svg-fallback" viewBox="0 0 300 380" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <radialGradient id="faceGrad" cx="50%" cy="40%" r="60%">
             <stop offset="0%" stop-color="#fff0e8"/>
@@ -153,13 +209,31 @@
         <!-- 볼 홍조 -->
         <ellipse cx="85" cy="190" rx="17" ry="9" fill="#ffb0c0" opacity="0.32"/>
         <ellipse cx="215" cy="190" rx="17" ry="9" fill="#ffb0c0" opacity="0.32"/>
-      </svg>
+          </svg><!-- /.haeun-svg-fallback -->
 
-      <div class="character-name-block">
-        <div class="character-name">하은</div>
-        <div class="character-subtitle">꿈꾸는 AI · 작은 안드로이드</div>
+        </div><!-- /.avatar-fallback-wrap -->
+
+      </div><!-- /.portrait-media-wrap -->
+
+      <!-- 스캔라인 오버레이 효과 -->
+      <div class="portrait-scan-line"></div>
+
+      <!-- HUD 상태 표시 바 -->
+      <div class="portrait-hud-bar">
+        <span class="hud-label">UNIT : HAEUN</span>
+        <span class="hud-status-badge">
+          <span class="hud-online-dot"></span>ONLINE
+        </span>
       </div>
-    </div>
+
+    </div><!-- /.haeun-portrait-frame -->
+  </div><!-- /.haeun-portrait-shell -->
+
+  <!-- 캐릭터 이름 블록 -->
+  <div class="character-name-block">
+    <div class="character-name">하은</div>
+    <div class="character-subtitle">꿈꾸는 AI · 작은 안드로이드</div>
+  </div>
 
     <!-- 오늘의 낭만 -->
     <div class="romance-section">
@@ -385,5 +459,7 @@
 </div>
 
 <script src="/js/app.js"></script>
+<!-- 3D 아바타 모듈 — ES module, 자동 defer -->
+<script type="module" src="/js/avatar.js"></script>
 </body>
 </html>
