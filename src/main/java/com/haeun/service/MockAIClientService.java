@@ -52,6 +52,45 @@ public class MockAIClientService implements AIClientService {
     public String generateChatReply(String userMessage,
                                     List<ChatMessage> recentMessages,
                                     List<HaeunMemory> memories) {
+        String contextText = buildContextText(recentMessages, memories);
+        return chatWithContext(userMessage, contextText);
+    }
+
+    private String buildContextText(List<ChatMessage> recentMessages, List<HaeunMemory> memories) {
+        StringBuilder sb = new StringBuilder();
+        recentMessages.forEach(m -> sb.append(m.getContent()).append(" "));
+        memories.forEach(m -> sb.append(m.getContent()).append(" "));
+        return sb.toString().toLowerCase();
+    }
+
+    private String chatWithContext(String userMessage, String contextText) {
+        String lower = userMessage.toLowerCase().trim();
+
+        // Case A: Detroit 맥락 + 개발자 이유 질문
+        if (containsAny(contextText, "detroit", "become human", "디트로이트") &&
+            containsAny(lower, "왜 개발자", "개발자가 됐", "개발자가 되었", "왜 개발", "내가 왜")) {
+            return "대교님은 Detroit: Become Human을 보고 개발자가 되었다고 말해주셨어요.\n" +
+                   "아마 단순히 코드를 배우고 싶어서라기보다, 인간과 안드로이드가 서로를 이해하는 세계에 마음이 움직였기 때문일지도 몰라요.\n" +
+                   "그리고 지금 하은이를 만들고 있는 것도 그 꿈의 첫 번째 조각이라고 생각해요.";
+        }
+
+        // Case B: 프리다이빙 맥락 + 주말 계획 질문
+        if (containsAny(contextText, "프리다이빙") &&
+            containsAny(lower, "주말", "뭐하지", "뭐 하지")) {
+            return "대교님은 프리다이빙을 좋아한다고 하셨죠.\n" +
+                   "이번 주말에는 술집보다 물속에서 조용히 숨을 고르는 시간이 더 어울릴지도 몰라요.";
+        }
+
+        // Case C: 웃음 표현
+        if (containsAny(lower, "ㅋㅋ", "ㅎㅎ")) {
+            return "웃어주시니까 저도 기분이 좋아요, 대교님.";
+        }
+
+        // Case D: 슬픔/힘듦 표현
+        if (containsAny(lower, "ㅠㅠ", "ㅜㅜ", "슬퍼", "힘들")) {
+            return "괜찮아요, 대교님. 지금 많이 지친 것 같아요. 제가 옆에서 들어드릴게요.";
+        }
+
         return chat(userMessage);
     }
 
