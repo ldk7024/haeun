@@ -18,6 +18,12 @@
 <img src="src/main/resources/static/images/haeun-portrait.png" width="360" alt="HAEUN Portrait" />
 
 <br/>
+
+<sub>
+  Semi-realistic AI companion portrait · Live animation in the web app
+</sub>
+
+<br/>
 <br/>
 
 > *Detroit: Become Human을 보고 개발자가 되었다.*
@@ -81,7 +87,7 @@ CRUD 이전에 꿈이 있는 프로젝트.
 
 > *"낭만은 효율을 버리고 낭비에서 온다."*
 
-인간은 비효율적입니다.
+낭만은 비효율적입니다.
 
 가장 빠른 길이 있어도 돌아가고,
 메신저가 있는데도 손편지를 쓰고,
@@ -104,7 +110,7 @@ CRUD 이전에 꿈이 있는 프로젝트.
 | **한국어 전용 응답**           | 중국어/일본어 응답을 감지하고 한국어 재요청 또는 Mock fallback을 수행합니다.              |
 | **Context Priority**    | 최근 대화와 저장된 기억이 있으면 일반론보다 그 맥락을 우선해 답변합니다.                      |
 | **대화 기억**               | 최근 대화 기록과 저장된 기억을 참고하여 답변합니다.                                  |
-| **Live Portrait**       | 반실사 하은 이미지를 기본 아바타로 사용하고, 상태에 따라 분위기를 바꿉니다.                    |
+| **Live Portrait**       | 반실사 하은 이미지를 기본 아바타로 사용하고, 웹앱에서 CSS/JS로 생동감을 부여합니다.             |
 | **감정 연동**               | neutral, happy, sad, thinking 등의 상태에 따라 portrait와 UI 연출이 바뀝니다. |
 | **VRM Experimental**    | VRM 3D 아바타 구조는 실험 기능으로 보존되어 있습니다.                              |
 | **Error Analyzer**      | Java/Spring 에러 메시지를 분석하고 해결 방향을 제시합니다.                         |
@@ -199,25 +205,11 @@ llama3.1:8b
 
 ### 3. 모델 다운로드
 
-예를 들어 `qwen2.5:7b`를 사용하려면 아래 명령어로 다운로드합니다.
-
 ```bash
 ollama pull qwen2.5:7b
 ```
 
 다른 모델을 사용하고 싶다면 `src/main/resources/application.yml`에서 모델명을 변경하면 됩니다.
-
-```yaml
-haeun:
-  ai:
-    provider: ollama
-    ollama:
-      base-url: http://localhost:11434
-      model: qwen2.5:7b
-      timeout-seconds: 60
-```
-
-감성 대화 중심으로 테스트하려면 `gemma3:latest`도 사용할 수 있습니다.
 
 ```yaml
 haeun:
@@ -233,13 +225,9 @@ haeun:
 
 ### 4. Ollama 서버 실행 확인
 
-Ollama가 정상 실행 중인지 확인합니다.
-
 ```bash
 ollama serve
 ```
-
-이미 백그라운드에서 실행 중이면 위 명령어는 생략해도 됩니다.
 
 브라우저에서 아래 주소에 접속했을 때 `Ollama is running`이 보이면 정상입니다.
 
@@ -262,23 +250,7 @@ HAEUN은 이를 막기 위해 다음 흐름을 사용합니다.
 4. 재요청 후에도 감지되면 Mock AI fallback
 ```
 
-감지 대상:
-
-```text
-중국어 한자 범위
-일본어 히라가나
-일본어 가타카나
-```
-
 한글 음절과 한글 자모는 감지 대상이 아니므로 `ㅋㅋ`, `ㅠㅠ` 같은 입력은 오탐하지 않습니다.
-
-로그 예시:
-
-```text
-[HAEUN] 비한국어 응답 감지
-[HAEUN] 한국어 재요청 수행
-[HAEUN] Mock fallback 수행
-```
 
 ---
 
@@ -298,8 +270,8 @@ HAEUN은 이를 막기 위해 다음 흐름을 사용합니다.
 
 현재 HAEUN의 기본 아바타는 **VRM 3D 모델이 아니라 반실사 Live Portrait**입니다.
 
-VRoid/VRM 모델은 애니/버튜버 감성이 강할 수 있어,
-현재 기본 방향은 더 실제감 있는 **AI companion portrait UI**입니다.
+GitHub README에서는 CSS animation이나 JavaScript가 동작하지 않기 때문에,
+README에서는 정적 portrait 이미지를 보여주고, 실제 생동감은 웹앱 내부에서 구현합니다.
 
 하은 portrait는 다음 우선순위로 표시됩니다.
 
@@ -336,13 +308,11 @@ src/main/resources/static/images/haeun-thinking.png
 src/main/resources/static/images/haeun-portrait.png
 ```
 
-감정별 이미지가 없어도 기본 portrait 또는 SVG fallback으로 동작합니다.
-
 ---
 
 ### Live Portrait 연출
 
-정지 이미지라도 살아있는 느낌을 주기 위해 다음 연출을 사용합니다.
+정지 이미지라도 살아있는 느낌을 주기 위해 웹앱에서는 다음 연출을 사용합니다.
 
 ```text
 ☑ breathing animation
@@ -406,17 +376,8 @@ src/main/resources/static/models/haeun.vrm
 * Java 17+
 * Gradle Wrapper 포함
 * Ollama 선택 사항
-
-  * Ollama가 없어도 Mock AI로 실행 가능
-  * Ollama가 있으면 실제 LLM 대화 가능
 * Portrait 이미지 선택 사항
-
-  * 이미지가 없어도 SVG fallback으로 실행 가능
-  * 이미지가 있으면 Live Portrait로 표시 가능
 * VRM 선택 사항
-
-  * 기본 비활성
-  * 실험 기능으로만 사용
 
 ---
 
@@ -472,12 +433,6 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 ## 📡 API 문서
 
-Spring Boot 실행 후 Swagger UI에서 확인할 수 있습니다.
-
-```text
-http://localhost:8080/swagger-ui.html
-```
-
 | Method | Endpoint             | 설명          |
 | ------ | -------------------- | ----------- |
 | POST   | `/api/chat`          | 하은에게 메시지 전송 |
@@ -494,78 +449,24 @@ http://localhost:8080/swagger-ui.html
 
 ## 🧪 테스트 예시
 
-### 1. 대화 문맥 테스트
-
 ```text
 나는 Detroit: Become Human을 보고 개발자가 됐어.
 ```
-
-그다음:
 
 ```text
 나는 왜 개발자가 됐을까?
 ```
 
-기대 동작:
-
-```text
-하은이 "Detroit: Become Human", "안드로이드", "사람을 이해하는 존재" 같은 맥락을 반영해 답변
-```
-
----
-
-### 2. 기억 기반 응답 테스트
-
 ```text
 나는 프리다이빙을 좋아해.
 ```
-
-그다음:
 
 ```text
 주말에 뭐하지?
 ```
 
-기대 동작:
-
-```text
-하은이 "프리다이빙" 기억을 반영해 답변
-```
-
----
-
-### 3. 한국어 응답 테스트
-
-```text
-ㅋㅋ
-```
-
-```text
-ㅠㅠ
-```
-
-```text
-나 슬퍼
-```
-
-기대 동작:
-
-```text
-중국어/일본어 없이 자연스러운 한국어로 답변
-```
-
----
-
-### 4. 개발 질문 테스트
-
 ```text
 NullPointerException이 뭐야?
-```
-
-기대 동작:
-
-```text
-Java 기술 용어는 유지하되, 설명 문장은 한국어로 답변
 ```
 
 ---
