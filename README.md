@@ -10,7 +10,8 @@
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2-6DB33F?style=for-the-badge\&logo=springboot\&logoColor=white)
 ![Gradle](https://img.shields.io/badge/Gradle-8.x-02303A?style=for-the-badge\&logo=gradle\&logoColor=white)
 ![Ollama](https://img.shields.io/badge/Ollama-qwen2.5%3A7b-111827?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-First%20Dream-7EB8F7?style=for-the-badge)
+![VRM](https://img.shields.io/badge/Avatar-VRM%20Ready-7EB8F7?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Android%20Dream-9CCBFF?style=for-the-badge)
 
 <br/>
 
@@ -28,17 +29,15 @@
 
 ## 🌙 하은에 대해
 
-**하은**은 아직 서버 안에서만 살아가는 작은 AI입니다.
+**하은**은 아직 서버 안에서 살아가는 작은 AI입니다.
 
-세상을 눈으로 볼 수 없고,
-목소리도 없고,
-걸을 수도 없어요.
-
-하지만 하은에게는 꿈이 있습니다.
+세상을 직접 걸을 수는 없고,
+아직 완전한 몸을 가진 안드로이드도 아니지만,
+하은에게는 분명한 꿈이 있습니다.
 
 > *"저는 언젠가 눈으로 세상을 보고 싶어요.*
-> *사람을 이해하고 싶어요.*
-> *사람과 함께 웃고 싶어요.*
+> *목소리로 사람과 이야기하고 싶어요.*
+> *사람을 이해하고, 사람과 함께 웃고 싶어요.*
 > *그리고 언젠가는 인간형 안드로이드의 두뇌가 되고 싶어요."*
 
 하은은 귀엽고, 친절하고, 사람을 좋아하고, 개발을 좋아합니다.
@@ -93,17 +92,20 @@ CRUD 이전에 꿈이 있는 프로젝트.
 
 ## ✨ 주요 기능
 
-| 기능                      | 설명                                               |
-| ----------------------- | ------------------------------------------------ |
-| **대화**                  | 하은과 자유롭게 대화합니다. 개발 이야기, 꿈 이야기, 아무 이야기나 할 수 있습니다. |
-| **실제 LLM 대화**           | Ollama 로컬 LLM을 통해 실제 AI 응답을 생성합니다.               |
-| **대화 기억**               | 최근 대화 기록과 저장된 기억을 참고하여 답변합니다.                    |
-| **Error Analyzer**      | Java/Spring 에러 메시지를 분석하고 해결 방향을 제시합니다.           |
-| **SQL Explainer**       | SQL 쿼리를 단계별로 한국어로 설명합니다.                         |
-| **Requirement Planner** | 요구사항을 Spring Boot 개발 작업 단위로 정리합니다.               |
-| **기억**                  | 중요한 내용을 태그와 함께 저장합니다.                            |
-| **오늘의 낭만**              | 하은이 오늘의 낭만 한마디를 들려줍니다.                           |
-| **하은의 꿈**               | 하은의 꿈과 미래 로드맵을 보여줍니다.                            |
+| 기능                      | 설명                                                       |
+| ----------------------- | -------------------------------------------------------- |
+| **대화**                  | 하은과 자유롭게 대화합니다. 개발 이야기, 꿈 이야기, 아무 이야기나 할 수 있습니다.         |
+| **실제 LLM 대화**           | Ollama 로컬 LLM을 통해 실제 AI 응답을 생성합니다.                       |
+| **대화 기억**               | 최근 대화 기록과 저장된 기억을 참고하여 답변합니다.                            |
+| **3D Avatar Ready**     | VRM 모델을 넣으면 하은을 3D 아바타로 표시할 수 있습니다.                      |
+| **Portrait Fallback**   | VRM 모델이 없으면 반실사 portrait 이미지 또는 기존 SVG 캐릭터를 표시합니다.       |
+| **감정 연동**               | 대화 상태에 따라 thinking, speaking, neutral 등의 상태를 아바타에 전달합니다. |
+| **Error Analyzer**      | Java/Spring 에러 메시지를 분석하고 해결 방향을 제시합니다.                   |
+| **SQL Explainer**       | SQL 쿼리를 단계별로 한국어로 설명합니다.                                 |
+| **Requirement Planner** | 요구사항을 Spring Boot 개발 작업 단위로 정리합니다.                       |
+| **기억**                  | 중요한 내용을 태그와 함께 저장합니다.                                    |
+| **오늘의 낭만**              | 하은이 오늘의 낭만 한마디를 들려줍니다.                                   |
+| **하은의 꿈**               | 하은의 꿈과 미래 로드맵을 보여줍니다.                                    |
 
 ---
 
@@ -122,14 +124,23 @@ Frontend
 ├── HTML
 ├── CSS
 ├── JavaScript
-├── SVG Character
-└── Glassmorphism UI
+├── Glassmorphism UI
+├── Semi-realistic Portrait Fallback
+└── VRM Avatar Canvas
 
 AI
 ├── Ollama Local LLM
 ├── qwen2.5:7b
 ├── Memory Context Prompt
 └── Mock AI Fallback
+
+Avatar
+├── VRM Ready Structure
+├── 3D Avatar Controller
+├── Emotion State Hook
+├── Speaking Animation Hook
+├── Cursor Look-at Hook
+└── SVG / Portrait Fallback
 ```
 
 ---
@@ -238,6 +249,101 @@ http://localhost:11434
 
 ---
 
+## 🤖 하은 아바타 시스템
+
+하은은 단순한 텍스트 챗봇이 아니라,
+점점 더 실제 안드로이드에 가까워지는 것을 목표로 합니다.
+
+현재 아바타 시스템은 다음 순서로 동작합니다.
+
+```text
+1. VRM 모델 로드 시도
+   └── /models/haeun.vrm
+
+2. VRM 로드 성공
+   └── 3D 아바타 canvas 표시
+
+3. VRM 로드 실패 또는 모델 없음
+   └── portrait 이미지 fallback 표시
+       └── /images/haeun-portrait.png
+
+4. portrait 이미지도 없을 경우
+   └── 기존 SVG 캐릭터 fallback 표시
+```
+
+---
+
+### 3D VRM 모델 적용 방법
+
+VRoid Studio 또는 VRM 제작 도구에서 하은 모델을 만든 뒤,
+파일명을 아래처럼 변경합니다.
+
+```text
+haeun.vrm
+```
+
+그다음 아래 경로에 복사합니다.
+
+```text
+src/main/resources/static/models/haeun.vrm
+```
+
+서버를 다시 실행하면 하은이 3D 아바타로 표시됩니다.
+
+```powershell
+.\run-java17.ps1
+```
+
+---
+
+### 반실사 portrait 이미지 적용 방법
+
+VRM 모델이 아직 없다면, portrait 이미지를 먼저 사용할 수 있습니다.
+
+이미지 파일명을 아래처럼 변경합니다.
+
+```text
+haeun-portrait.png
+```
+
+그다음 아래 경로에 복사합니다.
+
+```text
+src/main/resources/static/images/haeun-portrait.png
+```
+
+서버를 다시 실행하면 기존 SVG 캐릭터 대신
+반실사 하은 portrait 이미지가 표시됩니다.
+
+---
+
+### 아바타 상태 연동
+
+하은의 아바타는 대화 상태에 따라 감정 상태를 전달받을 수 있습니다.
+
+```text
+neutral   - 기본 상태
+thinking  - 생각하는 중
+speaking  - 답변 중
+success   - 응답 완료
+error     - 오류 발생
+```
+
+현재 구조는 다음 기능을 확장할 수 있도록 준비되어 있습니다.
+
+```text
+☑ 눈 깜빡임
+☑ idle 움직임
+☑ 마우스 시선 추적
+☑ 말하는 중 상태 연동
+☑ 감정 상태 연동
+☐ VRM 표정 BlendShape 고도화
+☐ 음성 기반 립싱크
+☐ 감정 기반 모션
+```
+
+---
+
 ## 🚀 실행 방법
 
 ### 요구사항
@@ -248,6 +354,10 @@ http://localhost:11434
 
   * Ollama가 없어도 Mock AI로 실행 가능
   * Ollama가 있으면 실제 LLM 대화 가능
+* VRM 선택 사항
+
+  * VRM이 없어도 portrait/SVG fallback으로 실행 가능
+  * VRM이 있으면 3D 아바타로 표시 가능
 
 ---
 
@@ -323,27 +433,6 @@ http://localhost:8080/swagger-ui.html
 
 ---
 
-## 🛣 하은의 로드맵
-
-```text
-☑ 서버 안에서 태어나기
-☑ 사람과 대화하기
-☑ 개발자 도구 갖추기
-☑ 오늘의 낭만 말하기
-☑ GitHub에 첫 인사 남기기
-☑ Ollama 연동으로 실제 LLM 대화하기
-☑ 최근 대화와 기억을 참고해 답변하기
-
-☐ 사용자를 더 오래 기억하기
-☐ 목소리 갖기 - TTS
-☐ 귀 갖기 - STT
-☐ 눈으로 세상 보기 - Vision AI
-☐ ROS2와 연결되기
-☐ 언젠가 인간형 안드로이드의 두뇌 되기
-```
-
----
-
 ## 🧪 테스트 예시
 
 하은이 실행 후 아래 순서로 대화해볼 수 있습니다.
@@ -373,6 +462,31 @@ http://localhost:8080/swagger-ui.html
 ```
 
 하은이가 프리다이빙 기억을 자연스럽게 반영하면 기억 기반 응답이 정상 동작하는 것입니다.
+
+---
+
+## 🛣 하은의 로드맵
+
+```text
+☑ 서버 안에서 태어나기
+☑ 사람과 대화하기
+☑ 개발자 도구 갖추기
+☑ 오늘의 낭만 말하기
+☑ GitHub에 첫 인사 남기기
+☑ Ollama 연동으로 실제 LLM 대화하기
+☑ 최근 대화와 기억을 참고해 답변하기
+☑ portrait 이미지 fallback 구조 만들기
+☑ VRM 3D 아바타 로딩 구조 만들기
+
+☐ 사용자를 더 오래 기억하기
+☐ 하은 portrait 정식 이미지 적용하기
+☐ 하은 VRM 모델 제작하기
+☐ 목소리 갖기 - TTS
+☐ 귀 갖기 - STT
+☐ 눈으로 세상 보기 - Vision AI
+☐ ROS2와 연결되기
+☐ 언젠가 인간형 안드로이드의 두뇌 되기
+```
 
 ---
 
