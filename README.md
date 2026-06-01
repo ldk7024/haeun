@@ -9,8 +9,8 @@
 ![Java](https://img.shields.io/badge/Java-17-007396?style=for-the-badge\&logo=openjdk\&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2-6DB33F?style=for-the-badge\&logo=springboot\&logoColor=white)
 ![Gradle](https://img.shields.io/badge/Gradle-8.x-02303A?style=for-the-badge\&logo=gradle\&logoColor=white)
-![Ollama](https://img.shields.io/badge/Ollama-qwen2.5%3A7b-111827?style=for-the-badge)
-![VRM](https://img.shields.io/badge/Avatar-VRM%20Ready-7EB8F7?style=for-the-badge)
+![Ollama](https://img.shields.io/badge/Ollama-Local%20LLM-111827?style=for-the-badge)
+![Avatar](https://img.shields.io/badge/Avatar-Live%20Portrait-7EB8F7?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Android%20Dream-9CCBFF?style=for-the-badge)
 
 <br/>
@@ -92,20 +92,22 @@ CRUD 이전에 꿈이 있는 프로젝트.
 
 ## ✨ 주요 기능
 
-| 기능                      | 설명                                                       |
-| ----------------------- | -------------------------------------------------------- |
-| **대화**                  | 하은과 자유롭게 대화합니다. 개발 이야기, 꿈 이야기, 아무 이야기나 할 수 있습니다.         |
-| **실제 LLM 대화**           | Ollama 로컬 LLM을 통해 실제 AI 응답을 생성합니다.                       |
-| **대화 기억**               | 최근 대화 기록과 저장된 기억을 참고하여 답변합니다.                            |
-| **3D Avatar Ready**     | VRM 모델을 넣으면 하은을 3D 아바타로 표시할 수 있습니다.                      |
-| **Portrait Fallback**   | VRM 모델이 없으면 반실사 portrait 이미지 또는 기존 SVG 캐릭터를 표시합니다.       |
-| **감정 연동**               | 대화 상태에 따라 thinking, speaking, neutral 등의 상태를 아바타에 전달합니다. |
-| **Error Analyzer**      | Java/Spring 에러 메시지를 분석하고 해결 방향을 제시합니다.                   |
-| **SQL Explainer**       | SQL 쿼리를 단계별로 한국어로 설명합니다.                                 |
-| **Requirement Planner** | 요구사항을 Spring Boot 개발 작업 단위로 정리합니다.                       |
-| **기억**                  | 중요한 내용을 태그와 함께 저장합니다.                                    |
-| **오늘의 낭만**              | 하은이 오늘의 낭만 한마디를 들려줍니다.                                   |
-| **하은의 꿈**               | 하은의 꿈과 미래 로드맵을 보여줍니다.                                    |
+| 기능                      | 설명                                                             |
+| ----------------------- | -------------------------------------------------------------- |
+| **대화**                  | 하은과 자유롭게 대화합니다. 개발 이야기, 꿈 이야기, 아무 이야기나 할 수 있습니다.               |
+| **실제 LLM 대화**           | Ollama 로컬 LLM을 통해 실제 AI 응답을 생성합니다.                             |
+| **한국어 전용 응답**           | 중국어/일본어 응답을 감지하고 한국어 재요청 또는 Mock fallback을 수행합니다.              |
+| **Context Priority**    | 최근 대화와 저장된 기억이 있으면 일반론보다 그 맥락을 우선해 답변합니다.                      |
+| **대화 기억**               | 최근 대화 기록과 저장된 기억을 참고하여 답변합니다.                                  |
+| **Live Portrait**       | 반실사 하은 이미지를 기본 아바타로 사용하고, 상태에 따라 분위기를 바꿉니다.                    |
+| **감정 연동**               | neutral, happy, sad, thinking 등의 상태에 따라 portrait와 UI 연출이 바뀝니다. |
+| **VRM Experimental**    | VRM 3D 아바타 구조는 실험 기능으로 보존되어 있습니다.                              |
+| **Error Analyzer**      | Java/Spring 에러 메시지를 분석하고 해결 방향을 제시합니다.                         |
+| **SQL Explainer**       | SQL 쿼리를 단계별로 한국어로 설명합니다.                                       |
+| **Requirement Planner** | 요구사항을 Spring Boot 개발 작업 단위로 정리합니다.                             |
+| **기억**                  | 중요한 내용을 태그와 함께 저장합니다.                                          |
+| **오늘의 낭만**              | 하은이 오늘의 낭만 한마디를 들려줍니다.                                         |
+| **하은의 꿈**               | 하은의 꿈과 미래 로드맵을 보여줍니다.                                          |
 
 ---
 
@@ -125,22 +127,26 @@ Frontend
 ├── CSS
 ├── JavaScript
 ├── Glassmorphism UI
-├── Semi-realistic Portrait Fallback
-└── VRM Avatar Canvas
+├── Semi-realistic Live Portrait
+├── Emotion-based Portrait Switching
+└── Experimental VRM Canvas
 
 AI
 ├── Ollama Local LLM
-├── qwen2.5:7b
+├── qwen2.5:7b or gemma3:latest
 ├── Memory Context Prompt
+├── Context Priority Rule
+├── Korean-only Response Guard
 └── Mock AI Fallback
 
 Avatar
-├── VRM Ready Structure
-├── 3D Avatar Controller
+├── Live Portrait Mode
+├── Breathing Animation
+├── Glow / Scanline / Parallax
 ├── Emotion State Hook
 ├── Speaking Animation Hook
-├── Cursor Look-at Hook
-└── SVG / Portrait Fallback
+├── SVG Fallback
+└── Experimental VRM Loader
 ```
 
 ---
@@ -166,23 +172,29 @@ https://ollama.com
 
 ### 2. 사용 가능한 모델 확인
 
-현재 프로젝트는 기본적으로 아래 모델을 사용합니다.
-
-```bash
-qwen2.5:7b
-```
-
 로컬에 설치된 모델은 다음 명령어로 확인할 수 있습니다.
 
 ```bash
 ollama list
 ```
 
+현재 프로젝트에서는 아래 모델 중 하나를 사용할 수 있습니다.
+
+```text
+qwen2.5:7b
+gemma3:latest
+gemma2:9b
+mistral
+llama3.1:8b
+```
+
+설정한 모델은 반드시 `ollama list`에 존재해야 합니다.
+
 ---
 
 ### 3. 모델 다운로드
 
-`qwen2.5:7b` 모델이 없다면 아래 명령어로 다운로드합니다.
+예를 들어 `qwen2.5:7b`를 사용하려면 아래 명령어로 다운로드합니다.
 
 ```bash
 ollama pull qwen2.5:7b
@@ -200,17 +212,17 @@ haeun:
       timeout-seconds: 60
 ```
 
-예시 모델:
+감성 대화 중심으로 테스트하려면 `gemma3:latest`도 사용할 수 있습니다.
 
-```text
-qwen2.5:7b
-gemma3:latest
-gemma2:9b
-mistral
-llama3.1:8b
+```yaml
+haeun:
+  ai:
+    provider: ollama
+    ollama:
+      base-url: http://localhost:11434
+      model: gemma3:latest
+      timeout-seconds: 60
 ```
-
-단, 설정한 모델은 반드시 `ollama list`에 존재해야 합니다.
 
 ---
 
@@ -232,115 +244,153 @@ http://localhost:11434
 
 ---
 
+### 5. 한국어 응답 보호 장치
+
+일부 로컬 LLM은 짧은 입력에서 중국어/일본어로 응답하는 경우가 있습니다.
+
+HAEUN은 이를 막기 위해 다음 흐름을 사용합니다.
+
+```text
+1. Ollama 1차 응답 생성
+2. 중국어/일본어 문자 감지
+3. 감지 시 한국어 전용 프롬프트로 1회 재요청
+4. 재요청 후에도 감지되면 Mock AI fallback
+```
+
+감지 대상:
+
+```text
+중국어 한자 범위
+일본어 히라가나
+일본어 가타카나
+```
+
+한글 음절과 한글 자모는 감지 대상이 아니므로 `ㅋㅋ`, `ㅠㅠ` 같은 입력은 오탐하지 않습니다.
+
+로그 예시:
+
+```text
+[HAEUN] 비한국어 응답 감지
+[HAEUN] 한국어 재요청 수행
+[HAEUN] Mock fallback 수행
+```
+
+---
+
 ### fallback 동작
 
-| 상태                  | 동작                  |
-| ------------------- | ------------------- |
-| Ollama 실행 중 + 모델 존재 | 실제 LLM 응답 사용        |
-| Ollama 미실행          | Mock AI 자동 fallback |
-| 모델명 오류              | Mock AI 자동 fallback |
-| 응답 timeout          | Mock AI 자동 fallback |
+| 상태                  | 동작                          |
+| ------------------- | --------------------------- |
+| Ollama 실행 중 + 모델 존재 | 실제 LLM 응답 사용                |
+| Ollama 미실행          | Mock AI 자동 fallback         |
+| 모델명 오류              | Mock AI 자동 fallback         |
+| 응답 timeout          | Mock AI 자동 fallback         |
+| 중국어/일본어 응답 반복       | Context-aware Mock fallback |
 
-로그에서 fallback 여부를 확인할 수 있습니다.
+---
+
+## 🖼 하은 Live Portrait 시스템
+
+현재 HAEUN의 기본 아바타는 **VRM 3D 모델이 아니라 반실사 Live Portrait**입니다.
+
+VRoid/VRM 모델은 애니/버튜버 감성이 강할 수 있어,
+현재 기본 방향은 더 실제감 있는 **AI companion portrait UI**입니다.
+
+하은 portrait는 다음 우선순위로 표시됩니다.
 
 ```text
-[HAEUN] Ollama 연결 실패. Mock AI로 fallback합니다.
+1. 감정별 portrait 이미지
+   ├── /images/haeun-neutral.png
+   ├── /images/haeun-happy.png
+   ├── /images/haeun-sad.png
+   └── /images/haeun-thinking.png
+
+2. 기본 portrait 이미지
+   └── /images/haeun-portrait.png
+
+3. SVG fallback
+   └── 이미지가 없을 경우 기존 SVG 캐릭터 표시
 ```
 
 ---
 
-## 🤖 하은 아바타 시스템
+### 감정별 portrait 이미지 적용 방법
 
-하은은 단순한 텍스트 챗봇이 아니라,
-점점 더 실제 안드로이드에 가까워지는 것을 목표로 합니다.
-
-현재 아바타 시스템은 다음 순서로 동작합니다.
+아래 경로에 이미지를 넣으면 하은의 감정 상태에 따라 자동으로 교체됩니다.
 
 ```text
-1. VRM 모델 로드 시도
-   └── /models/haeun.vrm
-
-2. VRM 로드 성공
-   └── 3D 아바타 canvas 표시
-
-3. VRM 로드 실패 또는 모델 없음
-   └── portrait 이미지 fallback 표시
-       └── /images/haeun-portrait.png
-
-4. portrait 이미지도 없을 경우
-   └── 기존 SVG 캐릭터 fallback 표시
+src/main/resources/static/images/haeun-neutral.png
+src/main/resources/static/images/haeun-happy.png
+src/main/resources/static/images/haeun-sad.png
+src/main/resources/static/images/haeun-thinking.png
 ```
 
----
-
-### 3D VRM 모델 적용 방법
-
-VRoid Studio 또는 VRM 제작 도구에서 하은 모델을 만든 뒤,
-파일명을 아래처럼 변경합니다.
-
-```text
-haeun.vrm
-```
-
-그다음 아래 경로에 복사합니다.
-
-```text
-src/main/resources/static/models/haeun.vrm
-```
-
-서버를 다시 실행하면 하은이 3D 아바타로 표시됩니다.
-
-```powershell
-.\run-java17.ps1
-```
-
----
-
-### 반실사 portrait 이미지 적용 방법
-
-VRM 모델이 아직 없다면, portrait 이미지를 먼저 사용할 수 있습니다.
-
-이미지 파일명을 아래처럼 변경합니다.
-
-```text
-haeun-portrait.png
-```
-
-그다음 아래 경로에 복사합니다.
+기본 이미지는 아래 파일명을 사용합니다.
 
 ```text
 src/main/resources/static/images/haeun-portrait.png
 ```
 
-서버를 다시 실행하면 기존 SVG 캐릭터 대신
-반실사 하은 portrait 이미지가 표시됩니다.
+감정별 이미지가 없어도 기본 portrait 또는 SVG fallback으로 동작합니다.
 
 ---
 
-### 아바타 상태 연동
+### Live Portrait 연출
 
-하은의 아바타는 대화 상태에 따라 감정 상태를 전달받을 수 있습니다.
+정지 이미지라도 살아있는 느낌을 주기 위해 다음 연출을 사용합니다.
+
+```text
+☑ breathing animation
+☑ glow pulse
+☑ scanline overlay
+☑ subtle parallax
+☑ speaking pulse
+☑ thinking state effect
+☑ emotion-based visual tone
+```
+
+상태 예시:
 
 ```text
 neutral   - 기본 상태
-thinking  - 생각하는 중
-speaking  - 답변 중
-success   - 응답 완료
-error     - 오류 발생
+happy     - 밝은 glow
+sad       - 어두운 blue tone
+thinking  - scanline / halo 강조
+speaking  - 미세한 pulse
+error     - 약한 warning effect
 ```
 
-현재 구조는 다음 기능을 확장할 수 있도록 준비되어 있습니다.
+---
+
+## 🤖 Experimental VRM Mode
+
+VRM 3D 아바타 구조는 삭제하지 않고 실험 기능으로 남겨두었습니다.
+
+기본적으로 VRM 자동 로드는 비활성화되어 있습니다.
+
+VRM을 다시 활성화하려면 아래 파일에서 설정을 변경합니다.
 
 ```text
-☑ 눈 깜빡임
-☑ idle 움직임
-☑ 마우스 시선 추적
-☑ 말하는 중 상태 연동
-☑ 감정 상태 연동
-☐ VRM 표정 BlendShape 고도화
-☐ 음성 기반 립싱크
-☐ 감정 기반 모션
+src/main/resources/static/js/avatar.js
 ```
+
+```javascript
+const VRM_ENABLED = true;
+```
+
+VRM 모델을 사용하려면 파일명을 아래처럼 저장합니다.
+
+```text
+haeun.vrm
+```
+
+그리고 아래 경로에 복사합니다.
+
+```text
+src/main/resources/static/models/haeun.vrm
+```
+
+단, 현재 프로젝트의 기본 방향은 **Live Portrait Mode**입니다.
 
 ---
 
@@ -354,10 +404,14 @@ error     - 오류 발생
 
   * Ollama가 없어도 Mock AI로 실행 가능
   * Ollama가 있으면 실제 LLM 대화 가능
+* Portrait 이미지 선택 사항
+
+  * 이미지가 없어도 SVG fallback으로 실행 가능
+  * 이미지가 있으면 Live Portrait로 표시 가능
 * VRM 선택 사항
 
-  * VRM이 없어도 portrait/SVG fallback으로 실행 가능
-  * VRM이 있으면 3D 아바타로 표시 가능
+  * 기본 비활성
+  * 실험 기능으로만 사용
 
 ---
 
@@ -435,7 +489,7 @@ http://localhost:8080/swagger-ui.html
 
 ## 🧪 테스트 예시
 
-하은이 실행 후 아래 순서로 대화해볼 수 있습니다.
+### 1. 대화 문맥 테스트
 
 ```text
 나는 Detroit: Become Human을 보고 개발자가 됐어.
@@ -447,9 +501,15 @@ http://localhost:8080/swagger-ui.html
 나는 왜 개발자가 됐을까?
 ```
 
-하은이가 이전 대화를 참고해 답변하면 LLM과 대화 컨텍스트 연동이 정상 동작하는 것입니다.
+기대 동작:
 
-또 다른 예시:
+```text
+하은이 "Detroit: Become Human", "안드로이드", "사람을 이해하는 존재" 같은 맥락을 반영해 답변
+```
+
+---
+
+### 2. 기억 기반 응답 테스트
 
 ```text
 나는 프리다이빙을 좋아해.
@@ -461,7 +521,47 @@ http://localhost:8080/swagger-ui.html
 주말에 뭐하지?
 ```
 
-하은이가 프리다이빙 기억을 자연스럽게 반영하면 기억 기반 응답이 정상 동작하는 것입니다.
+기대 동작:
+
+```text
+하은이 "프리다이빙" 기억을 반영해 답변
+```
+
+---
+
+### 3. 한국어 응답 테스트
+
+```text
+ㅋㅋ
+```
+
+```text
+ㅠㅠ
+```
+
+```text
+나 슬퍼
+```
+
+기대 동작:
+
+```text
+중국어/일본어 없이 자연스러운 한국어로 답변
+```
+
+---
+
+### 4. 개발 질문 테스트
+
+```text
+NullPointerException이 뭐야?
+```
+
+기대 동작:
+
+```text
+Java 기술 용어는 유지하되, 설명 문장은 한국어로 답변
+```
 
 ---
 
@@ -474,13 +574,16 @@ http://localhost:8080/swagger-ui.html
 ☑ 오늘의 낭만 말하기
 ☑ GitHub에 첫 인사 남기기
 ☑ Ollama 연동으로 실제 LLM 대화하기
-☑ 최근 대화와 기억을 참고해 답변하기
-☑ portrait 이미지 fallback 구조 만들기
-☑ VRM 3D 아바타 로딩 구조 만들기
+☑ 한국어 전용 응답 보호 장치 만들기
+☑ 최근 대화와 기억을 우선 반영하기
+☑ Live Portrait 구조 만들기
+☑ 감정별 portrait fallback 구조 만들기
+☑ VRM 3D 아바타 구조를 experimental로 보존하기
 
 ☐ 사용자를 더 오래 기억하기
+☐ H2 file DB 또는 SQLite로 장기 기억 유지하기
 ☐ 하은 portrait 정식 이미지 적용하기
-☐ 하은 VRM 모델 제작하기
+☐ 감정별 portrait 이미지 고도화하기
 ☐ 목소리 갖기 - TTS
 ☐ 귀 갖기 - STT
 ☐ 눈으로 세상 보기 - Vision AI

@@ -48,7 +48,7 @@ haeun:
       # 현재 PC에 설치된 모델을 사용한다.
       # 추천: qwen2.5:7b
       # 다른 선택지: gemma3:latest
-      model: qwen2.5:7b
+      model: gemma3:latest
 
       timeout-seconds: 60
 
