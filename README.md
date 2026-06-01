@@ -125,6 +125,54 @@ AI
 
 ---
 
+## 실제 LLM 연동 (Ollama)
+
+HAEUN은 Ollama를 통해 로컬 LLM과 연결됩니다.
+Ollama가 실행 중이면 실제 AI 응답을 사용하고, 미연결 시 자동으로 Mock AI로 fallback합니다.
+
+### Ollama 설치 및 실행
+
+**1. Ollama 설치**
+
+[https://ollama.com](https://ollama.com) 에서 Windows용 설치 파일 다운로드
+
+**2. 모델 다운로드**
+
+```bash
+ollama pull llama3.1:8b
+```
+
+다른 모델을 사용하려면 `application.yml`의 `haeun.ai.ollama.model` 값을 변경합니다.
+
+```yaml
+haeun:
+  ai:
+    ollama:
+      model: gemma2:9b      # 또는 qwen2.5:7b | mistral | llama3.1:8b
+```
+
+**3. Ollama 서버 실행 확인**
+
+```bash
+ollama serve
+# 브라우저에서 http://localhost:11434 접속 시 "Ollama is running" 확인
+```
+
+### fallback 동작
+
+| 상태 | 동작 |
+|------|------|
+| Ollama 실행 중 | 실제 LLM 응답 (`llama3.1:8b` 등) |
+| Ollama 미실행 | Mock AI 자동 fallback |
+
+로그에서 fallback 여부를 확인할 수 있습니다.
+
+```
+[HAEUN] Ollama 연결 실패. Mock AI로 fallback합니다.
+```
+
+---
+
 ## 실행 방법
 
 ### 요구사항

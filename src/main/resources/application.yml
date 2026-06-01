@@ -31,6 +31,27 @@ springdoc:
 server:
   port: 8080
 
+# ============================================================
+# HAEUN AI 설정
+# provider: ollama | mock
+# Ollama가 실행 중이면 ollama 사용, 아니면 mock으로 자동 fallback
+# 현재 PC에 설치된 Ollama 모델:
+# - qwen2.5:7b
+# - gemma3:latest
+# ============================================================
+haeun:
+  ai:
+    provider: ollama
+    ollama:
+      base-url: http://localhost:11434
+
+      # 현재 PC에 설치된 모델을 사용한다.
+      # 추천: qwen2.5:7b
+      # 다른 선택지: gemma3:latest
+      model: qwen2.5:7b
+
+      timeout-seconds: 60
+
 logging:
   level:
     com.haeun: DEBUG

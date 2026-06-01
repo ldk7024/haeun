@@ -431,6 +431,13 @@ html, body {
   0%, 100% { transform: translateY(0);    opacity: 0.4; }
   50%       { transform: translateY(-6px); opacity: 1; }
 }
+.typing-text {
+  font-size: 12px;
+  color: var(--text-sub);
+  margin-left: 4px;
+  font-style: italic;
+  animation: fade-in 0.4s ease;
+}
 
 .chat-input-area {
   display: flex; gap: 10px;

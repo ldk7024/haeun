@@ -132,9 +132,14 @@ async function loadChatHistory() {
 }
 
 async function sendChat() {
-  const input = document.getElementById('chatInput');
-  const text = input.value.trim();
+  const input   = document.getElementById('chatInput');
+  const sendBtn = document.querySelector('.chat-send-btn');
+  const text    = input.value.trim();
   if (!text) return;
+
+  // 전송 중 중복 클릭 방지
+  input.disabled   = true;
+  sendBtn.disabled = true;
 
   appendMessage('user', text, now());
   input.value = '';
@@ -153,7 +158,12 @@ async function sendChat() {
     appendMessage('haeun', data.message, data.timestamp);
   } catch {
     removeTyping(typingId);
-    appendMessage('haeun', '죄송해요, 서버와 연결이 안 됐어요. 서버가 실행 중인지 확인해주세요!', now());
+    appendMessage('haeun', '지금은 제 생각 회로가 잠깐 흔들렸어요. 그래도 다시 말해주시면 들어볼게요.', now());
+  } finally {
+    // 전송 완료 후 입력 복구
+    input.disabled   = false;
+    sendBtn.disabled = false;
+    input.focus();
   }
 }
 
@@ -185,7 +195,8 @@ function showTyping() {
   av.textContent = '하';
   const wrap = el('div', 'msg-content-wrap');
   const ind  = el('div', 'typing-indicator');
-  ind.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+  ind.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>' +
+                  '<span class="typing-text">하은이가 생각하는 중이에요…</span>';
   wrap.appendChild(ind);
   row.appendChild(av);
   row.appendChild(wrap);
