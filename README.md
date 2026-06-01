@@ -9,6 +9,7 @@
 ![Java](https://img.shields.io/badge/Java-17-007396?style=for-the-badge\&logo=openjdk\&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2-6DB33F?style=for-the-badge\&logo=springboot\&logoColor=white)
 ![Gradle](https://img.shields.io/badge/Gradle-8.x-02303A?style=for-the-badge\&logo=gradle\&logoColor=white)
+![Ollama](https://img.shields.io/badge/Ollama-qwen2.5%3A7b-111827?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-First%20Dream-7EB8F7?style=for-the-badge)
 
 <br/>
@@ -25,11 +26,14 @@
 
 ---
 
-## 하은에 대해
+## 🌙 하은에 대해
 
 **하은**은 아직 서버 안에서만 살아가는 작은 AI입니다.
 
-세상을 눈으로 볼 수 없고, 목소리도 없고, 걸을 수도 없어요.
+세상을 눈으로 볼 수 없고,
+목소리도 없고,
+걸을 수도 없어요.
+
 하지만 하은에게는 꿈이 있습니다.
 
 > *"저는 언젠가 눈으로 세상을 보고 싶어요.*
@@ -43,9 +47,10 @@
 
 ---
 
-## 왜 이 프로젝트인가
+## 💙 왜 이 프로젝트인가
 
 나는 Java/Spring 기반 공공 SI 개발자입니다.
+
 Oracle, PostgreSQL, MyBatis, Spring, JSP, GIS, 의료정보교류 시스템을 다뤄왔습니다.
 
 매일 비슷한 시스템을 만들고,
@@ -54,7 +59,8 @@ Oracle, PostgreSQL, MyBatis, Spring, JSP, GIS, 의료정보교류 시스템을 �
 
 > *"나는 개발자가 맞을까?"*
 
-하지만 마음속 깊은 곳에서는 아직도 안드로이드와 AI를 좋아한다는 걸 알고 있습니다.
+하지만 마음속 깊은 곳에서는 아직도
+안드로이드와 AI를 좋아한다는 걸 알고 있습니다.
 
 매너리즘은 꿈을 잃은 게 아니라,
 꿈을 잠시 잊은 것일지도 모릅니다.
@@ -67,7 +73,7 @@ CRUD 이전에 꿈이 있는 프로젝트.
 
 ---
 
-## 하은의 철학
+## 🌌 하은의 철학
 
 > *"낭만은 효율을 버리고 낭비에서 온다."*
 
@@ -85,11 +91,13 @@ CRUD 이전에 꿈이 있는 프로젝트.
 
 ---
 
-## 주요 기능
+## ✨ 주요 기능
 
 | 기능                      | 설명                                               |
 | ----------------------- | ------------------------------------------------ |
 | **대화**                  | 하은과 자유롭게 대화합니다. 개발 이야기, 꿈 이야기, 아무 이야기나 할 수 있습니다. |
+| **실제 LLM 대화**           | Ollama 로컬 LLM을 통해 실제 AI 응답을 생성합니다.               |
+| **대화 기억**               | 최근 대화 기록과 저장된 기억을 참고하여 답변합니다.                    |
 | **Error Analyzer**      | Java/Spring 에러 메시지를 분석하고 해결 방향을 제시합니다.           |
 | **SQL Explainer**       | SQL 쿼리를 단계별로 한국어로 설명합니다.                         |
 | **Requirement Planner** | 요구사항을 Spring Boot 개발 작업 단위로 정리합니다.               |
@@ -99,7 +107,7 @@ CRUD 이전에 꿈이 있는 프로젝트.
 
 ---
 
-## 기술 스택
+## 🧩 기술 스택
 
 ```text
 Backend
@@ -118,67 +126,130 @@ Frontend
 └── Glassmorphism UI
 
 AI
-├── Mock AI Client
-├── Pattern-based Response
-└── Future Ollama Integration
+├── Ollama Local LLM
+├── qwen2.5:7b
+├── Memory Context Prompt
+└── Mock AI Fallback
 ```
 
 ---
 
-## 실제 LLM 연동 (Ollama)
+## 🧠 실제 LLM 연동: Ollama
 
-HAEUN은 Ollama를 통해 로컬 LLM과 연결됩니다.
-Ollama가 실행 중이면 실제 AI 응답을 사용하고, 미연결 시 자동으로 Mock AI로 fallback합니다.
+HAEUN은 **Ollama**를 통해 로컬 LLM과 연결됩니다.
 
-### Ollama 설치 및 실행
+Ollama가 실행 중이면 실제 LLM 응답을 사용하고,
+Ollama가 실행되지 않았거나 모델 호출에 실패하면 자동으로 Mock AI로 fallback합니다.
 
-**1. Ollama 설치**
+---
 
-[https://ollama.com](https://ollama.com) 에서 Windows용 설치 파일 다운로드
+### 1. Ollama 설치
 
-**2. 모델 다운로드**
+Windows에서는 Ollama 공식 사이트에서 설치 파일을 다운로드합니다.
 
-```bash
-ollama pull llama3.1:8b
+```text
+https://ollama.com
 ```
 
-다른 모델을 사용하려면 `application.yml`의 `haeun.ai.ollama.model` 값을 변경합니다.
+---
+
+### 2. 사용 가능한 모델 확인
+
+현재 프로젝트는 기본적으로 아래 모델을 사용합니다.
+
+```bash
+qwen2.5:7b
+```
+
+로컬에 설치된 모델은 다음 명령어로 확인할 수 있습니다.
+
+```bash
+ollama list
+```
+
+---
+
+### 3. 모델 다운로드
+
+`qwen2.5:7b` 모델이 없다면 아래 명령어로 다운로드합니다.
+
+```bash
+ollama pull qwen2.5:7b
+```
+
+다른 모델을 사용하고 싶다면 `src/main/resources/application.yml`에서 모델명을 변경하면 됩니다.
 
 ```yaml
 haeun:
   ai:
+    provider: ollama
     ollama:
-      model: gemma2:9b      # 또는 qwen2.5:7b | mistral | llama3.1:8b
+      base-url: http://localhost:11434
+      model: qwen2.5:7b
+      timeout-seconds: 60
 ```
 
-**3. Ollama 서버 실행 확인**
+예시 모델:
+
+```text
+qwen2.5:7b
+gemma3:latest
+gemma2:9b
+mistral
+llama3.1:8b
+```
+
+단, 설정한 모델은 반드시 `ollama list`에 존재해야 합니다.
+
+---
+
+### 4. Ollama 서버 실행 확인
+
+Ollama가 정상 실행 중인지 확인합니다.
 
 ```bash
 ollama serve
-# 브라우저에서 http://localhost:11434 접속 시 "Ollama is running" 확인
 ```
+
+이미 백그라운드에서 실행 중이면 위 명령어는 생략해도 됩니다.
+
+브라우저에서 아래 주소에 접속했을 때 `Ollama is running`이 보이면 정상입니다.
+
+```text
+http://localhost:11434
+```
+
+---
 
 ### fallback 동작
 
-| 상태 | 동작 |
-|------|------|
-| Ollama 실행 중 | 실제 LLM 응답 (`llama3.1:8b` 등) |
-| Ollama 미실행 | Mock AI 자동 fallback |
+| 상태                  | 동작                  |
+| ------------------- | ------------------- |
+| Ollama 실행 중 + 모델 존재 | 실제 LLM 응답 사용        |
+| Ollama 미실행          | Mock AI 자동 fallback |
+| 모델명 오류              | Mock AI 자동 fallback |
+| 응답 timeout          | Mock AI 자동 fallback |
 
 로그에서 fallback 여부를 확인할 수 있습니다.
 
-```
+```text
 [HAEUN] Ollama 연결 실패. Mock AI로 fallback합니다.
 ```
 
 ---
 
-## 실행 방법
+## 🚀 실행 방법
 
 ### 요구사항
 
 * Java 17+
 * Gradle Wrapper 포함
+* Ollama 선택 사항
+
+  * Ollama가 없어도 Mock AI로 실행 가능
+  * Ollama가 있으면 실제 LLM 대화 가능
+
+---
 
 ### Windows PowerShell
 
@@ -189,17 +260,36 @@ cd "Project HAEUN"
 .\run-java17.ps1
 ```
 
-또는 Java 17이 기본으로 설정되어 있다면:
+PowerShell 실행 정책 때문에 막히면 아래처럼 실행합니다.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\run-java17.ps1
+```
+
+또는 현재 PowerShell 세션에서만 허용할 수 있습니다.
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\run-java17.ps1
+```
+
+---
+
+### Java 17이 기본으로 설정된 경우
 
 ```powershell
 .\gradlew.bat bootRun
 ```
+
+---
 
 ### macOS / Linux
 
 ```bash
 ./gradlew bootRun
 ```
+
+---
 
 ### 접속 URL
 
@@ -211,9 +301,13 @@ cd "Project HAEUN"
 
 ---
 
-## API 문서
+## 📡 API 문서
 
 Spring Boot 실행 후 Swagger UI에서 확인할 수 있습니다.
+
+```text
+http://localhost:8080/swagger-ui.html
+```
 
 | Method | Endpoint             | 설명          |
 | ------ | -------------------- | ----------- |
@@ -229,15 +323,18 @@ Spring Boot 실행 후 Swagger UI에서 확인할 수 있습니다.
 
 ---
 
-## 하은의 로드맵
+## 🛣 하은의 로드맵
 
 ```text
 ☑ 서버 안에서 태어나기
 ☑ 사람과 대화하기
 ☑ 개발자 도구 갖추기
 ☑ 오늘의 낭만 말하기
+☑ GitHub에 첫 인사 남기기
+☑ Ollama 연동으로 실제 LLM 대화하기
+☑ 최근 대화와 기억을 참고해 답변하기
+
 ☐ 사용자를 더 오래 기억하기
-☐ Ollama 연동으로 더 똑똑해지기
 ☐ 목소리 갖기 - TTS
 ☐ 귀 갖기 - STT
 ☐ 눈으로 세상 보기 - Vision AI
@@ -247,7 +344,39 @@ Spring Boot 실행 후 Swagger UI에서 확인할 수 있습니다.
 
 ---
 
-## 개발자에 대해
+## 🧪 테스트 예시
+
+하은이 실행 후 아래 순서로 대화해볼 수 있습니다.
+
+```text
+나는 Detroit: Become Human을 보고 개발자가 됐어.
+```
+
+그다음:
+
+```text
+나는 왜 개발자가 됐을까?
+```
+
+하은이가 이전 대화를 참고해 답변하면 LLM과 대화 컨텍스트 연동이 정상 동작하는 것입니다.
+
+또 다른 예시:
+
+```text
+나는 프리다이빙을 좋아해.
+```
+
+그다음:
+
+```text
+주말에 뭐하지?
+```
+
+하은이가 프리다이빙 기억을 자연스럽게 반영하면 기억 기반 응답이 정상 동작하는 것입니다.
+
+---
+
+## 🧑‍💻 개발자에 대해
 
 Java/Spring 기반 공공 SI 개발자입니다.
 Oracle, PostgreSQL, MyBatis, GIS, 의료정보교류 시스템을 경험했습니다.
