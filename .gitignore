@@ -37,3 +37,4 @@ python-memory-service/models/
 # 팀 협업이나 배포 환경에서 기억 데이터를 공유하고 싶다면
 # 아래 줄을 주석 처리하고 chroma_db/ 디렉토리를 커밋할 수 있다.
 python-memory-service/chroma_db/
+

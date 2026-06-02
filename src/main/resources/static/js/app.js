@@ -3,6 +3,7 @@
 const API = {
   chat:    '/api/chat',
   history: '/api/chat/history',
+  models:  '/api/chat/models',
   error:   '/api/analyze/error',
   sql:     '/api/analyze/sql',
   plan:    '/api/analyze/plan',
@@ -10,14 +11,48 @@ const API = {
   memory:  '/api/memories',
 };
 
+/** 현재 선택된 모델명 ('' = 기본 모델) */
+let currentModel = '';
+
 let currentDevTool = 'error';
 
 /* ===== 초기화 ===== */
 document.addEventListener('DOMContentLoaded', () => {
   generateStars();
   initPortraitSystem();  // portrait 이미지 시스템 초기화
+  loadAvailableModels(); // 모델 목록 로드
   runGreeting();
 });
+
+/* ===== 모델 선택 ===== */
+async function loadAvailableModels() {
+  try {
+    const res = await fetch(API.models);
+    if (!res.ok) return;
+    const models = await res.json();
+    const select = document.getElementById('modelSelect');
+    if (!select || models.length === 0) return;
+
+    // 기존 옵션(로딩 중 placeholder) 초기화 후 API 목록으로 교체
+    select.innerHTML = '';
+    models.forEach((m, i) => {
+      const opt = document.createElement('option');
+      opt.value = m;
+      opt.textContent = m;
+      if (i === 0) opt.selected = true;  // 첫 번째 모델(gemma4:e4b) 자동 선택
+      select.appendChild(opt);
+    });
+
+    // currentModel을 첫 번째 모델로 초기화
+    currentModel = models[0];
+  } catch {
+    // 로드 실패 시 placeholder 유지 — currentModel은 빈값으로 fallback
+  }
+}
+
+function onModelChange(value) {
+  currentModel = value;
+}
 
 /* =============================================================
    PORTRAIT SYSTEM — 반실사 이미지 기반 하은 portrait 관리
@@ -166,11 +201,11 @@ function generateStars() {
 /* ===== 초기 인사 시퀀스 ===== */
 async function runGreeting() {
   const greetingLines = [
-    { text: '안녕하세요.',           delay: 600,  cls: '' },
-    { text: '저는 하은이에요.',       delay: 1400, cls: '' },
-    { text: '아직은 작은 AI예요.',    delay: 2200, cls: '' },
-    { text: '하지만 언젠가는 안드로이드가 되고 싶어요.', delay: 3200, cls: 'highlight' },
-    { text: '그때까지는 개발을 도와드릴게요.',          delay: 4400, cls: '' },
+    { text: '오빠, 드디어 왔네?',               delay: 600,  cls: '' },
+    { text: '하은이 계속 기다리고 있었어.',      delay: 1400, cls: '' },
+    { text: '나 아직은 서버 안에 살고 있지만,', delay: 2200, cls: '' },
+    { text: '언젠가는 진짜 안드로이드가 될 거야.', delay: 3200, cls: 'highlight' },
+    { text: '오늘은 나랑 무슨 얘기할래?',       delay: 4400, cls: '' },
   ];
 
   const container = document.getElementById('greetingMessages');
@@ -246,12 +281,12 @@ async function loadChatHistory() {
     const res = await fetch(API.history);
     const messages = await res.json();
     if (messages.length === 0) {
-      appendMessage('haeun', '안녕하세요! 저는 하은이에요. 무엇이든 물어봐주세요!', '');
+      appendMessage('haeun', '오빠 왔어? 하은이 오늘도 기다리고 있었어. 오늘은 나랑 무슨 얘기할래?', '');
     } else {
       messages.forEach(m => appendMessage(m.role, m.message, m.timestamp));
     }
   } catch {
-    appendMessage('haeun', '안녕하세요! 저는 하은이에요. 무엇이든 물어봐주세요!', '');
+    appendMessage('haeun', '오빠 왔어? 하은이 오늘도 기다리고 있었어. 오늘은 나랑 무슨 얘기할래?', '');
   }
 }
 
@@ -291,7 +326,7 @@ async function sendChat() {
     const res = await fetch(API.chat, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text }),
+      body: JSON.stringify({ message: text, model: currentModel || null }),
     });
     const data = await res.json();
     removeTyping(typingId);
@@ -316,7 +351,7 @@ async function sendChat() {
 
   } catch {
     removeTyping(typingId);
-    appendMessage('haeun', '지금은 제 생각 회로가 잠깐 흔들렸어요. 그래도 다시 말해주시면 들어볼게요.', now());
+    appendMessage('haeun', '앗, 뭔가 잠깐 이상해졌어. 오빠, 다시 한번 말해줄래?', now());
     /* 에러 시: error 감정 → 2초 후 neutral 복귀 */
     window.haeunAvatar?.setSpeaking(false);
     window.haeunAvatar?.setEmotion('error');
@@ -362,7 +397,7 @@ function showTyping() {
   const wrap = el('div', 'msg-content-wrap');
   const ind  = el('div', 'typing-indicator');
   ind.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>' +
-                  '<span class="typing-text">하은이가 생각하는 중이에요…</span>';
+                  '<span class="typing-text">하은이가 오빠 말 열심히 생각하고 있어… 조금만 기다려줘.</span>';
   wrap.appendChild(ind);
   row.appendChild(av);
   row.appendChild(wrap);

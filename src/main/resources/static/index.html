@@ -282,6 +282,13 @@
       <div class="chat-messages" id="chatMessages">
         <!-- 메시지들이 여기에 -->
       </div>
+      <!-- 모델 선택 바 -->
+      <div class="model-bar">
+        <span class="model-bar-label">🤖 모델</span>
+        <select id="modelSelect" class="model-select" onchange="onModelChange(this.value)" title="사용할 Ollama 모델 선택">
+          <option value="" disabled>모델 로딩 중...</option>
+        </select>
+      </div>
       <div class="chat-input-area">
         <input
           type="text"
@@ -462,7 +469,7 @@
     </div>
     <div class="greeting-messages" id="greetingMessages"></div>
     <button class="greeting-start-btn" id="greetingStartBtn" onclick="closeGreeting()" style="display:none;">
-      하은과 대화 시작하기
+      하은이랑 얘기하러 가기
     </button>
   </div>
 </div>

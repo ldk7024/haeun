@@ -71,14 +71,21 @@ public class ChatService {
             log.debug("[HAEUN] 의미 기억 {}개 프롬프트에 주입", semanticMemories.size());
         }
 
-        // 5. Ollama 우선 → 실패 시 Mock fallback
+        // 5. Ollama 우선 → 실패 시 Mock fallback (선택 모델 전달)
+        String selectedModel = request.getModel();
+        if (selectedModel != null && !selectedModel.isBlank()) {
+            log.debug("[HAEUN] 선택된 모델: {}", selectedModel);
+        }
         String reply;
         try {
-            reply = ollamaService.generateChatReply(userMessage, recentMessages, memories, semanticMemories);
-            log.debug("[HAEUN] Ollama 응답 완료. length={}", reply.length());
+            log.info("[HAEUN] ▶ Ollama 호출 시작 — model={}, message='{}'",
+                    selectedModel != null ? selectedModel : "default", userMessage);
+            reply = ollamaService.generateChatReply(userMessage, recentMessages, memories, semanticMemories, selectedModel);
+            log.info("[HAEUN] ✓ Ollama 응답 완료 — length={}", reply.length());
         } catch (Exception e) {
-            log.warn("[HAEUN] Ollama 연결 실패. Mock AI로 fallback합니다. reason: {}", e.getMessage());
-            reply = mockService.generateChatReply(userMessage, recentMessages, memories, semanticMemories);
+            log.warn("[HAEUN] ✗ Ollama 실패 → Mock fallback 실행! reason: {}", e.getMessage());
+            log.warn("[HAEUN]   입력: '{}' 는 Mock 키워드 매칭 후 기본 응답으로 처리됩니다.", userMessage);
+            reply = mockService.generateChatReply(userMessage, recentMessages, memories, semanticMemories, null);
         }
 
         // 5. 하은 답변 저장

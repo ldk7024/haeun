@@ -4,15 +4,14 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-/**
- * application.yml 의 haeun.ai.* 설정을 바인딩합니다.
- */
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @ConfigurationProperties(prefix = "haeun.ai")
 public class HaeunAiProperties {
 
-    /** 사용할 AI 제공자 (ollama | mock) */
     private String provider = "ollama";
 
     private OllamaProperties ollama = new OllamaProperties();
@@ -21,7 +20,10 @@ public class HaeunAiProperties {
     @Setter
     public static class OllamaProperties {
         private String baseUrl = "http://localhost:11434";
-        private String model = "llama3.1:8b";
+        private String model = "gemma3:latest";
         private int timeoutSeconds = 60;
+
+        /** UI 드롭다운에 표시할 선택 가능 모델 목록 */
+        private List<String> availableModels = new ArrayList<>();
     }
 }

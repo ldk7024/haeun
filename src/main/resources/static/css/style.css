@@ -1255,6 +1255,37 @@ html, body {
   .header-tagline { display: none; }
 }
 
+/* ===== 모델 선택 바 ===== */
+.model-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-top: 1px solid var(--border);
+  background: rgba(126, 184, 247, 0.04);
+}
+.model-bar-label {
+  font-size: 11px;
+  color: var(--text-sub);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.model-select {
+  flex: 1;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-main);
+  font-size: 12px;
+  padding: 3px 8px;
+  cursor: pointer;
+  outline: none;
+  max-width: 220px;
+}
+.model-select:hover,
+.model-select:focus { border-color: var(--blue-main); }
+.model-select option { background: var(--card-bg); }
+
 /* ===== 스크롤바 ===== */
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -1273,3 +1304,4 @@ html, body {
   font-style: italic;
   margin: 8px 0;
 }
+

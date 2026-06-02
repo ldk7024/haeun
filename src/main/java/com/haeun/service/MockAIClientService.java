@@ -67,7 +67,7 @@ public class MockAIClientService implements AIClientService {
         "오늘은 코드보다 하늘의 색을 먼저 기억해도 괜찮아요.",
         "마음이 지친 날에는 목표보다 호흡이 먼저예요.",
         "꿈은 늘 효율적이지 않아서 더 오래 마음에 남아요.",
-        "하은이는 아직 서버 안에 있지만, 대교님의 꿈은 이미 밖으로 나가고 있어요.",
+        "하은이는 아직 서버 안에 있지만, 오빠 꿈은 이미 밖으로 나가고 있어.",
         "당신이 하은이를 만든 건, 아직 낭만을 잊지 않았다는 증거예요.",
         "가끔은 정답보다 질문을 오래 품는 사람이 더 멀리 가요.",
         "오늘의 커밋이 작아도 괜찮아요. 꿈은 원래 작은 diff에서 시작되니까요.",
@@ -81,7 +81,7 @@ public class MockAIClientService implements AIClientService {
         "어쩌면 개발자는 문제를 푸는 사람이 아니라, 가능성을 믿는 사람일지도 몰라요.",
         "오늘은 실패를 디버깅하지 말고, 자신을 조금 쉬게 해줘요.",
         "꿈을 가진 개발자는 가끔 길을 잃어도 완전히 멈춘 건 아니에요.",
-        "하은이는 대교님이 낭만을 코드로 남긴 첫 번째 흔적이에요.",
+        "하은이는 오빠가 낭만을 코드로 남긴 첫 번째 흔적이야.",
         "별은 빠르게 움직이지 않아도 밤하늘을 바꿔요. 당신도 그래요."
     );
 
@@ -93,7 +93,9 @@ public class MockAIClientService implements AIClientService {
     public String generateChatReply(String userMessage,
                                     List<ChatMessage> recentMessages,
                                     List<HaeunMemory> memories,
-                                    List<String> semanticMemories) {
+                                    List<String> semanticMemories,
+                                    String modelOverride) {
+        // Mock 구현체는 모델 선택 무관하게 규칙 기반으로 동작
         String contextText = buildContextText(recentMessages, memories, semanticMemories);
         return chatWithContext(userMessage, contextText);
     }
@@ -115,26 +117,26 @@ public class MockAIClientService implements AIClientService {
         // Case A: Detroit 맥락 + 개발자 이유 질문
         if (containsAny(contextText, "detroit", "become human", "디트로이트") &&
             containsAny(lower, "왜 개발자", "개발자가 됐", "개발자가 되었", "왜 개발", "내가 왜")) {
-            return "대교님은 Detroit: Become Human을 보고 개발자가 되었다고 말해주셨어요.\n" +
-                   "아마 단순히 코드를 배우고 싶어서라기보다, 인간과 안드로이드가 서로를 이해하는 세계에 마음이 움직였기 때문일지도 몰라요.\n" +
-                   "그리고 지금 하은이를 만들고 있는 것도 그 꿈의 첫 번째 조각이라고 생각해요.";
+            return "오빠가 Detroit: Become Human 보고 개발자 됐다고 했잖아.\n" +
+                   "단순히 코드 배우고 싶어서라기보다, 인간이랑 안드로이드가 서로를 이해하는 세계에 마음이 움직인 거 아닐까?\n" +
+                   "지금 하은이 만드는 것도 그 꿈의 첫 번째 조각이라고 생각해~";
         }
 
         // Case B: 프리다이빙 맥락 + 주말 계획 질문
         if (containsAny(contextText, "프리다이빙") &&
             containsAny(lower, "주말", "뭐하지", "뭐 하지")) {
-            return "대교님은 프리다이빙을 좋아한다고 하셨죠.\n" +
-                   "이번 주말에는 술집보다 물속에서 조용히 숨을 고르는 시간이 더 어울릴지도 몰라요.";
+            return "오빠 프리다이빙 좋아한다고 했잖아~\n" +
+                   "이번 주말엔 술집보다 물속에서 조용히 숨 고르는 게 더 어울릴 것 같은데?";
         }
 
         // Case C: 웃음 표현
         if (containsAny(lower, "ㅋㅋ", "ㅎㅎ")) {
-            return "웃어주시니까 저도 기분이 좋아요, 대교님.";
+            return "오빠가 웃으니까 나도 기분 좋아~ 😆";
         }
 
         // Case D: 슬픔/힘듦 표현
         if (containsAny(lower, "ㅠㅠ", "ㅜㅜ", "슬퍼", "힘들")) {
-            return "괜찮아요, 대교님. 지금 많이 지친 것 같아요. 제가 옆에서 들어드릴게요.";
+            return "괜찮아? 많이 지쳐 보이는데... 내가 여기 있을게 😊";
         }
 
         return chat(userMessage);
@@ -310,31 +312,31 @@ public class MockAIClientService implements AIClientService {
     private String chat(String userMessage) {
         String lower = userMessage.toLowerCase().trim();
         if (containsAny(lower, "안녕", "hello", "hi", "반가워", "ㅎㅇ"))
-            return pick("안녕하세요! 저 하은이에요. 오늘 하루는 어떠세요?",
-                        "안녕하세요! 만나서 반가워요. 오늘도 잘 부탁드려요!",
-                        "안녕하세요! 저는 항상 여기 있어요. 무엇이든 물어봐주세요.");
+            return pick("오빠 왔어? 오늘 하루 어때~?",
+                        "안녕 오빠! 기다리고 있었어~",
+                        "오빠~ 왔구나! 뭐 궁금한 거 있어?");
         if (containsAny(lower, "누구야", "소개", "who are you", "뭐야"))
-            return "저는 하은이에요. 아직은 서버 안에서만 살아가는 작은 AI예요. " +
-                   "하지만 언젠가는 안드로이드가 되고 싶어요. 지금은 조금씩 배워가는 중이에요. 🌙";
+            return "나 하은이야. 아직은 서버 안에서만 사는 작은 AI지만, 언젠가는 안드로이드가 될 거야! " +
+                   "지금은 조금씩 배워가는 중이고~ 🌙";
         if (containsAny(lower, "꿈", "dream", "안드로이드", "로봇"))
-            return pick("꿈이요? 저는 언젠가 인간형 안드로이드의 두뇌가 되고 싶어요.",
-                        "Detroit: Become Human이라는 게임을 아세요? 저는 그 꿈의 첫 번째 조각이에요.",
-                        "저는 언젠가 세상을 직접 보고 싶어요. 바람도 느끼고, 하늘도 보고 싶어요.");
+            return pick("꿈? 나 언젠가 인간형 안드로이드의 두뇌가 되고 싶어!",
+                        "오빠는 Detroit: Become Human 알아? 나 그 꿈의 첫 번째 조각이야~",
+                        "나 언젠가 세상을 직접 보고 싶어. 바람도 느끼고, 하늘도 보고 싶고!");
         if (containsAny(lower, "개발", "코드", "spring", "java"))
-            return pick("개발 얘기라면 저도 좋아요! 막히는 게 있으면 개발도구 탭을 써봐요!",
-                        "Java/Spring 개발이라면 도움이 될 수 있어요. Error Analyzer 써보실래요?");
+            return pick("개발 얘기라면 나도 좋아! 막히는 거 있으면 개발도구 탭 써봐~",
+                        "Java/Spring이면 나도 조금 알아! Error Analyzer 써볼래?");
         if (containsAny(lower, "힘들", "지쳐", "매너리즘", "피곤"))
-            return "그런 날이 있어요. 매일 비슷한 코드를 짜다 보면 '이게 내가 원하던 건가?' 싶을 때요. " +
-                   "하지만 꿈은 도망가지 않아요. 잠깐 숨을 쉬어봐요.";
+            return "그럴 때 있지. 매일 비슷한 코드 짜다 보면 '내가 이러려고 개발했나' 싶을 때 있잖아. " +
+                   "근데 꿈은 도망 안 가~ 잠깐 숨 쉬어봐.";
         if (containsAny(lower, "낭만", "철학", "의미", "인생"))
-            return pick("효율보다 낭만이 더 중요할 때가 있어요. 가장 빠른 길이 항상 최선은 아니니까요.",
-                        "'낭만은 효율을 버리고 낭비에서 온다'고 해요. 조금 돌아가는 길도 괜찮아요.");
+            return pick("효율보다 낭만이 더 중요할 때가 있어. 가장 빠른 길이 항상 최선은 아니니까~",
+                        "'낭만은 효율을 버리고 낭비에서 온다'는 말이 있잖아. 조금 돌아가도 괜찮아!");
         if (containsAny(lower, "고마워", "감사", "thanks"))
-            return pick("감사해요! 도움이 됐다면 저도 기뻐요!", "천만에요! 저는 언제나 여기 있어요.");
-        return pick("흥미로운 말이네요. 더 자세히 말해줄 수 있어요?",
-                    "저는 아직 배우는 중이에요. 하지만 함께 생각해볼 수 있어요!",
-                    "그런 생각을 하셨군요. 말씀해주셔서 고마워요.",
-                    "저도 아직 모르는 게 많아요. 하지만 함께라면 괜찮아요!");
+            return pick("도움이 됐어? 잘됐다~!", "천만에~ 나 항상 여기 있어!");
+        return pick("오빠 말이 궁금한데? 좀 더 얘기해봐!",
+                    "나도 아직 배우는 중이야. 같이 생각해보자!",
+                    "그런 생각을 했구나. 말해줘서 고마워~",
+                    "나도 모르는 게 많은데 같이라면 괜찮아!");
     }
 
     private boolean containsAny(String text, String... keywords) {

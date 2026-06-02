@@ -36,6 +36,7 @@ server:
 # provider: ollama | mock
 # Ollama가 실행 중이면 ollama 사용, 아니면 mock으로 자동 fallback
 # 현재 PC에 설치된 Ollama 모델:
+# - gemma4:e4b
 # - qwen2.5:7b
 # - gemma3:latest
 # ============================================================
@@ -45,12 +46,18 @@ haeun:
     ollama:
       base-url: http://localhost:11434
 
-      # 현재 PC에 설치된 모델을 사용한다.
-      # 추천: qwen2.5:7b
-      # 다른 선택지: gemma3:latest
-      model: gemma3:latest
+      # 기본 모델 (UI 드롭다운 초기 선택값)
+      model: gemma4:e4b
 
-      timeout-seconds: 60
+      # UI 드롭다운에 표시할 선택 가능 모델 목록
+      # ollama list 로 설치 확인 후 추가/제거한다.
+      available-models:
+        - "gemma4:e4b"
+        - "qwen2.5:7b"
+        - "gemma3:latest"
+
+      # read timeout — gemma4 등 대형 모델 생성 시간 대응 (connect는 코드에서 30초 고정)
+      timeout-seconds: 300
 
   memory:
     vector:
